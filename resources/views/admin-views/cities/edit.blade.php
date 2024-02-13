@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('title', translate('Update Category Discount'))
+@section('title', translate('Update city'))
 
 @push('css_or_js')
 
@@ -8,152 +8,172 @@
 
 @section('content')
     <div class="content container-fluid">
+
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-header-title">
                 <span class="page-header-icon">
-                    <img src="{{asset('public/assets/admin/img/coupon.png')}}" class="w--20" alt="">
+                    <img src="{{asset('public/assets/admin/img/category.png')}}" class="w--24" alt="">
                 </span>
                 <span>
-                    {{translate('discount update')}}
+                    {{translate('city_setup')}}
                 </span>
             </h1>
         </div>
         <!-- End Page Header -->
-        <div class="card mb-3">
-            <div class="card-body">
-                <form action="{{route('admin.discount.update', [$discount['id']])}}" method="post">
-                    @csrf
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="form-group mb-0">
-                                <label class="input-label" for="exampleFormControlInput1">{{translate('name')}}</label>
-                                <input type="text" name="name" value="{{$discount->name}}" class="form-control" placeholder="{{ translate('New discount') }}" maxlength="255" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group mb-0" id="type-category">
-                                <label class="input-label" for="exampleFormControlSelect1">{{translate('category')}} <span
-                                        class="input-label-secondary">*</span></label>
-                                <select name="category_id" class="form-control js-select2-custom">
-                                    @foreach($categories as $category)
-                                        <option value="{{$category['id']}}" {{ $category['id'] == $discount['category_id'] ? 'selected' : '' }}>{{$category['name']}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label class="input-label" for="exampleFormControlInput1">{{translate('start')}} {{translate('date')}}</label>
-                                <label class="input-date">
-                                    <input type="text" name="start_date" value="{{date('Y/m/d',strtotime($discount['start_date']))}}"
-                                           id="start_date"
-                                           class="js-flatpickr form-control flatpickr-custom"
-                                           placeholder="{{ \App\CentralLogics\translate('dd/mm/yy') }}"
-                                           data-hs-flatpickr-options='{ "dateFormat": "Y/m/d", "minDate": "today" }' required>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label class="input-label" for="exampleFormControlInput1">{{translate('expire')}} {{translate('date')}}</label>
-                                <label class="input-date">
-                                    <input type="text" name="expire_date" value="{{date('Y/m/d',strtotime($discount['expire_date']))}}"
-                                           id="expire_date"
-                                           class="js-flatpickr form-control flatpickr-custom"
-                                           placeholder="{{ \App\CentralLogics\translate('dd/mm/yy') }}"
-                                           data-hs-flatpickr-options='{ "dateFormat": "Y/m/d", "minDate": "today" }' required>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group mb-0">
-                                <label class="input-label" for="exampleFormControlSelect1">{{translate('discount')}} {{translate('type')}}<span
-                                        class="input-label-secondary">*</span></label>
-                                <select name="discount_type" class="form-control" onchange="show_item(this.value)" id="discount_type">
-                                    <option value="percent" {{ $discount['discount_type'] == 'percent'? 'selected' : '' }}>{{translate('percent')}}</option>
-                                    <option value="amount" {{ $discount['discount_type'] == 'amount'? 'selected' : '' }}>{{translate('amount')}}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group mb-0">
-                                <label class="input-label" for="exampleFormControlInput1">{{translate('discount_amount')}}</label>
-                                <input type="number" step="0.1" name="discount_amount" value="{{$discount['discount_amount']}}" class="form-control" placeholder="{{ translate('discount_amount') }}" required>
-                            </div>
-                        </div>
-                        <div class="col-6" id="max_amount_div">
-{{--                        <div class="col-6 {{ $discount['discount_type'] == 'amount' ? 'd-none' : '' }}" id="max_amount_div">--}}
-                            <div class="form-group mb-0">
-                                <label class="input-label" for="exampleFormControlInput1">{{translate('maximum_amount')}}</label>
-                                <input type="number" step="0.1" name="maximum_amount" value="{{$discount['maximum_amount']}}" class="form-control" placeholder="{{ translate('maximum_amount') }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="btn--container justify-content-end">
-                            <button type="reset" class="btn btn--reset">{{translate('reset')}}</button>
-                            <button type="submit" class="btn btn--primary">{{translate('submit')}}</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
 
+        <div class="row g-2">
+            <div class="col-sm-12 col-lg-12">
+                <div class="card">
+                    <div class="card-body pt-sm-0 pb-sm-4">
+                        <form action="{{route('admin.cities.update',[$city['id']])}}" method="post" enctype="multipart/form-data">
+                            @csrf
+                            @php($data = Helpers::get_business_settings('language'))
+                            @php($default_lang = Helpers::get_default_language())
+                            {{-- @php($default_lang = 'en') --}}
+                            @if ($data && array_key_exists('code', $data[0]))
+                                {{-- @php($default_lang = json_decode($language)[0]) --}}
+                                <ul class="nav nav-tabs d-inline-flex mb-5">
+                                    @foreach ($data as $lang)
+                                    <li class="nav-item">
+                                        <a class="nav-link lang_link {{ $lang['default'] == true ? 'active' : '' }}" href="#"
+                                        id="{{ $lang['code'] }}-link">{{ \App\CentralLogics\Helpers::get_language_name($lang['code']) . '(' . strtoupper($lang['code']) . ')' }}</a>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                <div class="row  g-4">
+                                    @foreach ($data as $lang)
+                                        <?php
+                                            if (count($city['translations'])) {
+                                                $translate = [];
+                                                foreach ($city['translations'] as $t) {
+                                                    if ($t->locale == $lang['code'] && $t->key == "name") {
+                                                        $translate[$lang['code']]['name'] = $t->value;
+                                                    }
+                                                }
+                                            }
+                                        ?>
+                                        <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form"
+                                                id="{{ $lang['code'] }}-form">
+                                            <div class="col-lg-12">
+                                                 <label class="form-label"
+                                                    for="exampleFormControlInput1">{{translate('city')}} {{ translate('name') }}
+                                                ({{ strtoupper($lang['code']) }})</label>
+                                                <input type="text" name="name[]" class="form-control" placeholder="{{translate('city')}} {{ translate('name') }}" maxlength="255"
+                                                    {{$lang['status'] == true ? 'required':''}} value="{{$city["name"] ?? ""}}"
+                                                    @if($lang['status'] == true) oninvalid="document.getElementById('{{$lang['code']}}-link').click()" @endif>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="status">{{ translate('Status') }}</label>
+                                            <select name="status" class="form-control" required>
+                                                <option value="active" @if($city["status"] == 'active') 'selected' @endif>{{ translate('Active') }}</option>
+                                                <option value="inactive" @if($city["status"] == 'inactive') 'selected' @endif>{{ translate('Inactive') }}</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <input type="hidden" name="lang[]" value="{{ $lang['code'] }}">
+                                    @endforeach
+                            @else
+                                        <div class="lang_form col-sm-6" id="{{ $default_lang }}-form">
+                                            <div class="col-lg-12">
+                                                <label class="form-label"
+                                                    for="exampleFormControlInput1">{{translate('city')}} {{ translate('name') }}
+                                                ({{ strtoupper($default_lang) }})</label>
+                                                <input type="text" name="name[]" class="form-control" maxlength="255"
+                                                    placeholder="{{translate('city')}} {{ translate('name') }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="status">{{ translate('Status') }}</label>
+                                            <select name="status" class="form-control" required>
+                                                <option value="active">{{ translate('Active') }}</option>
+                                                <option value="inactive">{{ translate('Inactive') }}</option>
+                                            </select>
+                                        </div>
+
+                                        <input type="hidden" name="lang[]" value="{{ $default_lang }}">
+                                    @endif
+                                    
+                                    <div class="col-12">
+                                        <div class="btn--container justify-content-end">
+                                            <button type="reset" class="btn btn--reset">{{translate('reset')}}</button>
+                                            <button type="submit" class="btn btn--primary">{{translate('submit')}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- End Table -->
+        </div>
     </div>
 
 @endsection
 
 @push('script_2')
-    <script>
+<script>
 
-        $(document).on('ready', function () {
-            // INITIALIZATION OF FLATPICKR
-            // =======================================================
-            $('.js-flatpickr').each(function () {
-                $.HSCore.components.HSFlatpickr.init($(this));
-            });
-        });
-
-        $('#start_date,#expire_date').change(function () {
-            let fr = $('#start_date').val();
-            let to = $('#expire_date').val();
-            if (fr != '' && to != '') {
-                if (fr > to) {
-                    $('#start_date').val('');
-                    $('#expire_date').val('');
-                    toastr.error('Invalid date range!', Error, {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
+        function status_change_alert(url, message, e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: message,
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonColor: 'default',
+                confirmButtonColor: '#107980',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = url;
                 }
+            })
+        }
+</script>
+
+    <script>
+        $(".lang_link").click(function(e){
+            e.preventDefault();
+            $(".lang_link").removeClass('active');
+            $(".lang_form").addClass('d-none');
+            $(this).addClass('active');
+
+            let form_id = this.id;
+            let lang = form_id.split("-")[0];
+            console.log(lang);
+            $("#"+lang+"-form").removeClass('d-none');
+            if(lang == '{{$default_lang}}')
+            {
+                $(".from_part_2").removeClass('d-none');
+            }
+            else
+            {
+                $(".from_part_2").addClass('d-none');
             }
         });
+    </script>
 
-        let selected_type = $("#discount_type").val();
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
-        $(document).ready(function() {
-            if (selected_type === 'amount') {
-                $("#max_amount_div").hide();
-            } else {
-                $("#max_amount_div").show();
-            }
-        });
+                reader.onload = function (e) {
+                    $('#viewer').attr('src', e.target.result);
+                }
 
-        function show_item(type) {
-            if (type === 'amount') {
-                $("#max_amount_div").hide();
-            } else {
-                $("#max_amount_div").show();
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        $(document).ready(function() {
-            $('form').on('reset', function(e) {
-                $("#max_amount_div").show();
-            });
+        $("#customFileEg1").change(function () {
+            readURL(this);
         });
-
     </script>
-
 @endpush

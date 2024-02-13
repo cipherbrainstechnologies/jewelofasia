@@ -16,7 +16,10 @@ return new class extends Migration
         Schema::create('zipcodes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('city_id')->constrained('cities');
-            $table->string('zipcode');
+            $table->longText('zipcode');
+            $table->enum('order_before_day',['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])->default('sunday');
+            $table->string('delivery_order_day')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->softDeletes();
             $table->timestamps();
         });

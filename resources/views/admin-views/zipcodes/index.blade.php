@@ -1,9 +1,10 @@
 @extends('layouts.admin.app')
 
-@section('title', translate('Add new city'))
+@section('title', translate('Add new zipcode'))
 
 @push('css_or_js')
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link href="{{asset('public/assets/admin/css/tags-input.min.css')}}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -16,7 +17,7 @@
                     <img src="{{asset('public/assets/admin/img/category.png')}}" class="w--24" alt="">
                 </span>
                 <span>
-                    {{translate('city_setup')}}
+                    {{translate('zipcode_setup')}}
                 </span>
             </h1>
         </div>
@@ -26,7 +27,7 @@
             <div class="col-sm-12 col-lg-12">
                 <div class="card">
                     <div class="card-body pt-sm-0 pb-sm-4">
-                        <form action="{{route('admin.cities.store')}}" method="post" enctype="multipart/form-data">
+                        <form action="{{route('admin.zipcodes.store')}}" method="post" enctype="multipart/form-data">
                             @csrf
                             @php($data = Helpers::get_business_settings('language'))
                             @php($default_lang = Helpers::get_default_language())
@@ -43,17 +44,51 @@
                                 </ul>
                                 <div class="row  g-4">
                                     @foreach ($data as $lang)
+                                        <div class="col-sm-6">
+                                            <label for="city">{{ translate('City') }}</label>
+                                            <select name="city" class="form-control" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @foreach($city as $ct)
+                                                    <option value="{{$ct['id']}}">{{ $ct['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
                                         <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form"
                                                 id="{{ $lang['code'] }}-form">
-                                            <div class="col-lg-12">
+                                            <div class="col-lg-12 ">
                                                  <label class="form-label"
-                                                    for="exampleFormControlInput1">{{translate('city')}} {{ translate('name') }}
+                                                    for="exampleFormControlInput1">{{translate('zipcode')}}
                                                 ({{ strtoupper($lang['code']) }})</label>
-                                                <input type="text" name="name[]" class="form-control" placeholder="{{translate('city')}} {{ translate('name') }}" maxlength="255"
-                                                    {{$lang['status'] == true ? 'required':''}}
-                                                    @if($lang['status'] == true) oninvalid="document.getElementById('{{$lang['code']}}-link').click()" @endif>
+                                                <input type="text" name="zipcode[]" class="form-control" placeholder="{{translate('zipcode')}} " data-role="tagsinput" oninvalid="this.setCustomValidity('Zipcode is required')" oninput="this.setCustomValidity('')">
                                             </div>
                                         </div>
+                                        
+                                        <div class="col-sm-6">
+                                            <label for="order_before_day">{{ translate('Order Before Day') }}</label>
+                                            <select name="order_before_day" class="form-control" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @if(!empty($days))
+                                                    @foreach($days as $day)
+                                                        <option value="{{$day}}" @if($day=="sunday") selected @endif>{{ucfirst($day)}}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label for="delivery_order_day">{{ translate('Delivery Days') }}</label>
+                                            <select name="delivery_order_day[]" class="form-control js-select2-custom" multiple="multiple" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @if(!empty($days))
+                                                    @foreach($days as $day)
+                                                        <option value="{{$day}}">{{ucfirst($day)}}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+
+
                                         <div class="col-sm-6">
                                             <label for="status">{{ translate('Status') }}</label>
                                             <select name="status" class="form-control" required>
@@ -65,15 +100,51 @@
                                         <input type="hidden" name="lang[]" value="{{ $lang['code'] }}">
                                     @endforeach
                             @else
-                                        <div class="lang_form col-sm-6" id="{{ $default_lang }}-form">
+                            <div class="col-sm-6">
+                                            <label for="city">{{ translate('City') }}</label>
+                                            <select name="city" class="form-control" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @foreach($city as $ct)
+                                                    <option value="$ct['id']">{{ $ct['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form"
+                                                id="{{ $lang['code'] }}-form">
                                             <div class="col-lg-12">
-                                                <label class="form-label"
-                                                    for="exampleFormControlInput1">{{translate('city')}} {{ translate('name') }}
-                                                ({{ strtoupper($default_lang) }})</label>
-                                                <input type="text" name="name[]" class="form-control" maxlength="255"
-                                                    placeholder="{{translate('city')}} {{ translate('name') }}" required>
+                                                 <label class="form-label"
+                                                    for="exampleFormControlInput1">{{translate('zipcode')}}
+                                                ({{ strtoupper($lang['code']) }})</label>
+                                                <input type="text" name="zipcode" class="form-control" placeholder="{{translate('zipcode')}} " data-role="tagsinput">
                                             </div>
                                         </div>
+                                        
+                                        <div class="col-sm-6">
+                                            <label for="order_before_day">{{ translate('Order Before Day') }}</label>
+                                            <select name="order_before_day" class="form-control" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @if(!empty($days))
+                                                    @foreach($days as $day)
+                                                        <option value="{{$day}}" @if($day=="sunday") selected @endif>{{ucfirst($day)}}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label for="delivery_order_day">{{ translate('Delivery Days') }}</label>
+                                            <select name="delivery_order_day[]" class="form-control js-select2-custom" multiple="multiple" required>
+                                                <option value="">{{ translate('Select') }}</option>
+                                                @if(!empty($days))
+                                                    @foreach($days as $day)
+                                                        <option value="{{$day}}">{{ucfirst($day)}}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+
+
                                         <div class="col-sm-6">
                                             <label for="status">{{ translate('Status') }}</label>
                                             <select name="status" class="form-control" required>
@@ -101,7 +172,7 @@
                 <div class="card">
                     <div class="card-header border-0">
                         <div class="card--header">
-                            <h5 class="card-title">{{translate('Category Table')}} <span class="badge badge-soft-secondary">{{ $city->total() }}</span> </h5>
+                            <h5 class="card-title">{{translate('Zipcode Table')}} <span class="badge badge-soft-secondary">{{ $zipcodes->total() }}</span> </h5>
                             <form action="{{url()->current()}}" method="GET">
                                 <div class="input-group">
                                     <input id="datatableSearch_" type="search" name="search" maxlength="255"
@@ -127,28 +198,34 @@
                             <thead class="thead-light">
                             <tr>
                                 <th class="text-center">{{translate('#')}}</th>
-                                <th>{{translate('city')}} {{ translate('name') }}</th>
+                                <th>{{translate('zipcode')}}</th>
+                                <th>{{translate('city')}}</th>
                                 <th>{{translate('status')}}</th>
                                 <th class="text-center">{{translate('action')}}</th>
                             </tr>
                             </thead>
 
                             <tbody>
-                            @foreach($city as $key=>$ct)
+                            @foreach($zipcodes as $key=>$zipcode)
                                 <tr>
-                                    <td class="text-center">{{$city->firstItem()+$key}}</td>
+                                    <td class="text-center">{{$zipcodes->firstItem()+$key}}</td>
                                     <td>
-                                    <span class="d-block font-size-sm text-body text-trim-50">
-                                        {{$ct['name']}}
-                                    </span>
+                                        <span class="d-block font-size-sm text-body text-trim-50 text-wrap-normal">
+                                            {{$zipcode['zipcode']}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="d-block font-size-sm text-body text-trim-50">
+                                            {{$zipcode['city']['name']}}
+                                        </span>
                                     </td>
                                     <td>
 
                                         <label class="toggle-switch">
                                             <input type="checkbox"
-                                                onclick="status_change_alert('{{ route('admin.cities.status', [$ct->id, $ct->status ? 0 : 1]) }}', '{{ $ct->status? translate('you_want_to_disable_this_city'): translate('you_want_to_active_this_city') }}', event)"
+                                                onclick="status_change_alert('{{ route('admin.zipcodes.status', [$zipcode->id, $zipcode->status ? 0 : 1]) }}', '{{ $ct->status? translate('you_want_to_disable_this_city'): translate('you_want_to_active_this_city') }}', event)"
                                                 class="toggle-switch-input" id="stocksCheckbox{{ $ct->id }}"
-                                                {{ $ct->status ? 'checked' : '' }}>
+                                                {{ $zipcode->status ? 'checked' : '' }}>
                                             <span class="toggle-switch-label text">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
@@ -159,15 +236,15 @@
                                         <!-- Dropdown -->
                                         <div class="btn--container justify-content-center">
                                             <a class="action-btn"
-                                                href="{{route('admin.cities.edit',[$ct['id']])}}">
+                                                href="{{route('admin.zipcodes.edit',[$zipcode['id']])}}">
                                             <i class="tio-edit"></i></a>
                                             <a class="action-btn btn--danger btn-outline-danger" href="javascript:"
-                                                onclick="form_alert('city-{{$ct['id']}}','{{ translate("Want to delete this") }}')">
+                                                onclick="form_alert('city-{{$zipcode['id']}}','{{ translate("Want to delete this") }}')">
                                                 <i class="tio-delete-outlined"></i>
                                             </a>
                                         </div>
-                                        <form action="{{route('admin.cities.delete',[$ct['id']])}}"
-                                                method="post" id="city-{{$ct['id']}}">
+                                        <form action="{{route('admin.zipcodes.delete',[$zipcode['id']])}}"
+                                                method="post" id="city-{{$zipcode['id']}}">
                                             @csrf @method('delete')
                                         </form>
                                         <!-- End Dropdown -->
@@ -178,7 +255,7 @@
                         </table>
 
                                 
-                        @if(count($city) == 0)
+                        @if(count($zipcodes) == 0)
                         <div class="text-center p-4">
                             <img class="w-120px mb-3" src="{{asset('/public/assets/admin/svg/illustrations/sorry.svg')}}" alt="Image Description">
                             <p class="mb-0">{{translate('No_data_to_show')}}</p>
@@ -187,7 +264,7 @@
 
                         <table>
                             <tfoot>
-                            {!! $city->links() !!}
+                            {!! $zipcodes->links() !!}
                             </tfoot>
                         </table>
 
@@ -201,66 +278,12 @@
 @endsection
 
 @push('script_2')
-
+<script src="{{asset('public/assets/admin/js/tags-input.min.js')}}"></script>
 <script>
-
-        function status_change_alert(url, message, e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Are you sure?',
-                text: message,
-                type: 'warning',
-                showCancelButton: true,
-                cancelButtonColor: 'default',
-                confirmButtonColor: '#107980',
-                cancelButtonText: 'No',
-                confirmButtonText: 'Yes',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    location.href = url;
-                }
-            })
-        }
+    $(document).ready(function () {
+        $("input[data-role=tagsinput]").tagsinput({
+            confirmKeys: [13, 44, 32], // Enter, comma, and space trigger tag creation
+        });
+    });
 </script>
-
-    <script>
-        $(".lang_link").click(function(e){
-            e.preventDefault();
-            $(".lang_link").removeClass('active');
-            $(".lang_form").addClass('d-none');
-            $(this).addClass('active');
-
-            let form_id = this.id;
-            let lang = form_id.split("-")[0];
-            console.log(lang);
-            $("#"+lang+"-form").removeClass('d-none');
-            if(lang == '{{$default_lang}}')
-            {
-                $(".from_part_2").removeClass('d-none');
-            }
-            else
-            {
-                $(".from_part_2").addClass('d-none');
-            }
-        });
-    </script>
-
-    <script>
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $('#viewer').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        $("#customFileEg1").change(function () {
-            readURL(this);
-        });
-    </script>
 @endpush

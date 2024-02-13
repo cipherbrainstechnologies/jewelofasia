@@ -250,6 +250,17 @@
                                 </a>
                             </li>
 
+                            <li class="navbar-vertical-aside-has-menu {{Request::is('admin/zipcodes*') ?'show active':''}}">
+                                <a class="js-navbar-vertical-aside-menu-link nav-link"
+                                   href="{{route('admin.zipcodes.add-new')}}" title="{{translate('Zipcodes')}}">
+                                    <i class="tio-shopping-basket nav-icon"></i>
+                                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                    <!-- {{translate('Zipcodes')}} -->
+                                    Zipcodes
+                                </span>
+                                </a>
+                            </li>
+
                         @if(Helpers::module_permission_check(MANAGEMENT_SECTION['product_management']))
                             <li class="nav-item">
                                 <small

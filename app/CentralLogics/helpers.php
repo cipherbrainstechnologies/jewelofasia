@@ -17,6 +17,10 @@ use Illuminate\Support\Str;
 
 class Helpers
 {
+    public static function days(){
+        $days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+        return $days;
+    }
     public static function error_processor($validator)
     {
         $err_keeper = [];

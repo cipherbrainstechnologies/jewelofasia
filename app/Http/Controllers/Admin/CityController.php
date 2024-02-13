@@ -4,78 +4,106 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\City;
+use App\CentralLogics\Helpers;
+use Brian2694\Toastr\Facades\Toastr;
 
 class CityController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function __construct(
+        private City $city
+    ){}
+    
+    public function index(Request $request)
     {
-        //
+        $query_param = [];
+        $search = $request['search'];
+        if ($request->has('search')) {
+            $key = explode(' ', $request['search']);
+            $city = $this->city->where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->orWhere('name', 'like', "%{$value}%");
+                }
+            });
+            $query_param = ['search' => $request['search']];
+        } else {
+            $city = $this->city;
+        }
+        $city = $city->orderBY('id', 'ASC')->paginate(Helpers::getPagination())->appends($query_param);
+        return view('admin-views.cities.index', compact('city', 'search'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:cities',
+            'name.*' => 'required|unique:cities',
+        ],[
+            'name.*.unique' => 'The city name has already been taken.',
         ]);
-    
-        City::create(['name' => $request->name]);
-    
-        return redirect()->route('cities.index')->with('success', 'City created successfully');
+
+        foreach ($request->name as $name) {
+            if (strlen($name) > 255) {
+                toastr::error(translate('Name is too long!'));
+                return back();
+            }
+        }
+        $ct = $this->city;
+        $ct->name = $request->name[array_search('en', $request->lang)];
+        $ct->status = $request->status;
+        $ct->save();
+        
+        Toastr::success(translate('City created successfully'));
+        return back();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        $city = $this->city->with('translations')->find($id);
+        return view('admin-views.cities.edit', compact('city'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name.*' => 'required|unique:cities',
+        ],[
+            'name.*.unique' => 'The city name has already been taken.',
+        ]);
+        foreach ($request->name as $name) {
+            if (strlen($name) > 255) {
+                toastr::error(translate('Name is too long!'));
+                return back();
+            }
+        }
+        $ct = $this->city->find($id);
+        $ct->name = $request->name[array_search('en', $request->lang)];
+        $ct->status = $request->status;
+        $ct->save();
+        // foreach ($request->lang as $index => $key) {
+        //     if ($key != 'en') {
+        //         Translation::updateOrInsert(
+        //             ['translationable_type' => 'App\Model\City',
+        //                 'translationable_id' => $ct->id,
+        //                 'locale' => $key,
+        //                 'key' => 'name'],
+        //             ['value' => $request->name[$index]]
+        //         );
+        //     }
+        // }
+        Toastr::success(translate('City updated successfully'));
+        return back();
     }
 
     /**
@@ -84,8 +112,13 @@ class CityController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        $city = $this->city->find($id);
+        if(!empty($city)){
+            $city->delete();
+            Toastr::success(translate('City removed!'));
+        }
+        return back();
     }
 }

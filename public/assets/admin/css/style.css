@@ -5659,3 +5659,6 @@ aside .navbar-vertical-content {
 .offline-payment--information-single {
     align-content: inherit;
 }
+.text-wrap-normal{
+  white-space: normal !important;
+}

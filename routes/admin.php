@@ -105,6 +105,16 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::delete('delete/{id}', 'CityController@delete')->name('delete');
         });
 
+        Route::group(['prefix' => 'zipcodes', 'as' => 'zipcodes.'], function () {
+            Route::get('add-new', 'ZipcodeController@index')->name('add-new');
+            Route::post('store', 'ZipcodeController@store')->name('store');
+            Route::get('edit/{id}', 'ZipcodeController@edit')->name('edit');
+            Route::post('update/{id}', 'ZipcodeController@update')->name('update');
+            Route::get('list', 'ZipcodeController@list')->name('list');
+            Route::get('status/{id}/{status}', 'ZipcodeController@status')->name('status');
+            Route::delete('delete/{id}', 'ZipcodeController@delete')->name('delete');
+        });
+
         Route::group(['prefix' => 'attribute', 'as' => 'attribute.','middleware'=>['module:product_management']], function () {
             Route::get('add-new', 'AttributeController@index')->name('add-new');
             Route::post('store', 'AttributeController@store')->name('store');

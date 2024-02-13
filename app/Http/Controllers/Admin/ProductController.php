@@ -288,22 +288,22 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
                 }
 
                 $variations[] = $item;
-                $stock_count += $item['stock'];
+                // $stock_count += $item['stock'];
             }
         } else {
             $stock_count = (integer)$request['total_stock'];
         }
 
-        if ((integer)$request['total_stock'] != $stock_count) {
-            $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
-        }
+        // if ((integer)$request['total_stock'] != $stock_count) {
+        //     $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
+        // }
 
         if ($validator->getMessageBag()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
@@ -535,22 +535,22 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
                 }
 
                 $variations[] = $item;
-                $stock_count += $item['stock'];
+                // $stock_count += $item['stock'];
             }
         } else {
             $stock_count = (integer)$request['total_stock'];
         }
 
-        if ((integer)$request['total_stock'] != $stock_count) {
-            $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
-        }
+        // if ((integer)$request['total_stock'] != $stock_count) {
+        //     $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
+        // }
 
         if ($validator->getMessageBag()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
