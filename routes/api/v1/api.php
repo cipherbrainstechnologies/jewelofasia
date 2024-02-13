@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\CustomerWalletController;
 use App\Http\Controllers\Api\V1\OfflinePaymentMethodController;
 use App\Http\Controllers\Api\V1\DeliverymanController;
+use App\Http\Controllers\Api\V1\SubscriptionController;
 
 Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function () {
 
@@ -192,5 +193,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
     Route::post('customer/change-language', [CustomerController::class, 'change_language']);
     Route::post('delivery-man/change-language', [DeliverymanController::class, 'change_language']);
 
+    Route::get('get_paypal_product', [SubscriptionController::class, 'get_products']);
 
 });

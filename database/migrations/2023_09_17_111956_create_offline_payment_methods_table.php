@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('offline_payment_methods', function (Blueprint $table) {
+        Schema::table('offline_payment_methods', function (Blueprint $table) {
             $table->id();
             $table->string('method_name');
             $table->text('method_fields');
@@ -31,6 +31,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('offline_payment_methods');
+        Schema::table('offline_payment_methods', function (Blueprint $table) {
+            $table->dropColumn('column');
+        });
     }
 };

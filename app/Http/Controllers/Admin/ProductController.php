@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\CentralLogics\PaypalHelper;
 
 class ProductController extends Controller
 {
@@ -38,7 +39,7 @@ class ProductController extends Controller
         private Product $product,
         private Review $review,
         private Tag $tag,
-        private Translation $translation
+        private Translation $translation,
     ){}
 
     /**
@@ -328,6 +329,33 @@ class ProductController extends Controller
         $p->attributes = $request->has('attribute_id') ? json_encode($request->attribute_id) : json_encode([]);
         $p->status = $request->status? $request->status:0;
 
+        $paypal_product_id = null;
+        $paypal_weekly_plan_id = null;
+        $paypal_biweekly_plan_id = null;
+        $paypal_monthly_plan_id = null;
+
+        if(!empty($request->choice) && in_array('subscription', $request->choice)) {
+            $paypalHelper = new PaypalHelper();
+            $paypal_product_data = [
+                'name' => $request->name[array_search('en', $request->lang)],
+                'description' => $request->description[array_search('en', $request->lang)],
+            ];
+            $paypal_product_id = $paypalHelper->createProduct($paypal_product_data);
+            if(in_array('weekly', $options[0])) {
+                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", 1);
+            }
+            if(in_array('bi-weekly', $options[0])) {
+                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 2);
+            }
+            if(in_array('monthly', $options[0])) {
+                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", 1);
+            }
+        }
+        
+        $p->paypal_product_id = $paypal_product_id;
+        $p->paypal_weekly_plan_id = $paypal_weekly_plan_id;
+        $p->paypal_biweekly_plan_id = $paypal_biweekly_plan_id;
+        $p->paypal_monthly_plan_id = $paypal_monthly_plan_id;
         $p->save();
 
         $p->tags()->sync($tag_ids);
