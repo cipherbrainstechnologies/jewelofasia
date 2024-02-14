@@ -342,13 +342,13 @@ class ProductController extends Controller
             ];
             $paypal_product_id = $paypalHelper->createProduct($paypal_product_data);
             if(in_array('weekly', $options[0])) {
-                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", "WEEK", 1);
+                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", "WEEK", 1, $this->getPriceByType($variations, 'weekly'));
             }
             if(in_array('bi-weekly', $options[0])) {
-                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 'WEEK', 2);
+                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 'WEEK', 2, $this->getPriceByType($variations, 'bi-weekly'));
             }
             if(in_array('monthly', $options[0])) {
-                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", "MONTH", 1);
+                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", "MONTH", 1, $this->getPriceByType($variations, 'monthly'));
             }
         }
         
@@ -563,22 +563,22 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
                 }
 
                 $variations[] = $item;
-                $stock_count += $item['stock'];
+                // $stock_count += $item['stock'];
             }
         } else {
             $stock_count = (integer)$request['total_stock'];
         }
 
-        if ((integer)$request['total_stock'] != $stock_count) {
-            $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
-        }
+        // if ((integer)$request['total_stock'] != $stock_count) {
+        //     $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
+        // }
 
         if ($validator->getMessageBag()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
@@ -606,6 +606,22 @@ class ProductController extends Controller
 
         $p->attributes = $request->has('attribute_id') ? json_encode($request->attribute_id) : json_encode([]);
         $p->status = $request->status? $request->status:0;
+
+        $product = $this->product->withoutGlobalScopes()->with('translations')->find($id);
+        // dd($options);
+
+        // if(!empty($request->choice) && in_array('subscription', $request->choice)) {
+        //     $paypalHelper = new PaypalHelper();
+        //     if(in_array('weekly', $options[0])) {
+        //         $paypal_weekly_plan_id = $paypalHelper->update_plan_price($product->paypal_weekly_plan_id, $this->getPriceByType($variations, 'weekly'));
+        //     }
+        //     if(in_array('bi-weekly', $options[0])) {
+        //         $paypal_biweekly_plan_id = $paypalHelper->update_plan_price($product->paypal_biweekly_plan_id, $this->getPriceByType($variations, 'bi-weekly'));
+        //     }
+        //     if(in_array('monthly', $options[0])) {
+        //         $paypal_monthly_plan_id = $paypalHelper->update_plan_price($product->paypal_monthly_plan_id, $this->getPriceByType($variations, 'monthly'));
+        //     }
+        // }
 
         $p->save();
 
@@ -895,6 +911,15 @@ class ProductController extends Controller
             Toastr::warning(translate('product_quantity_can_not_be_less_than_0_!'));
         }
         return back();
+    }
+
+    function getPriceByType($dataArray, $typeToFind) {
+        foreach ($dataArray as $item) {
+            if (isset($item['type']) && $item['type'] === $typeToFind) {
+                return $item['price'];
+            }
+        }
+        return null;
     }
 
 }

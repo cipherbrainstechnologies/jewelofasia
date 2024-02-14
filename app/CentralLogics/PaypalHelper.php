@@ -74,7 +74,7 @@ class PaypalHelper
         return $paypal_product->id;
     }
 
-    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count)
+    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count, $price)
     {
         try {
             $create_plan = new Client();
@@ -100,7 +100,7 @@ class PaypalHelper
                         "total_cycles" => 1,
                         "pricing_scheme" => [
                             "fixed_price" => [
-                                "value" => "1",
+                                "value" => !empty($price) ? $price : "0",
                                 "currency_code" => "AUD"
                             ]
                         ]
@@ -109,7 +109,7 @@ class PaypalHelper
                 "payment_preferences" => [
                     "auto_bill_outstanding" => true,
                     "setup_fee" => [
-                        "value" => "0",
+                        "value" => !empty($price) ? $price : "0",
                         "currency_code" => "AUD"
                     ],
                     "setup_fee_failure_action" => "CONTINUE",
@@ -127,4 +127,48 @@ class PaypalHelper
             dd($e);
         }
     }
+
+    public function update_plan_price($id, $price)
+    {
+        dd('https://api-m.sandbox.paypal.com/v1/billing/plans/' . $id . '/update-pricing-schemes');
+        try {
+            $create_plan = new Client();
+            $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/plans/' . $id . '/update-pricing-schemes', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Prefer' => 'return=representation',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                "pricing_schemes"=> [
+                    [
+                        "billing_cycle_sequence"=> 1,
+                        "pricing_scheme"=> [
+                            "fixed_price"=> [
+                                "value"=> "10",
+                                "currency_code"=> "AUD"
+                            ],
+                        ]
+                    ],
+                    [
+                        "billing_cycle_sequence"=> 2,
+                        "pricing_scheme"=> [
+                            "fixed_price"=> [
+                                "value"=> "50",
+                                "currency_code"=> "AUD"
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+        $paypal_plan = json_decode($response->getBody()->getContents());
+        return $paypal_plan->id;
+        } catch(Exception $e) {
+            dd($e);
+        }
+    }
+
+
 }
