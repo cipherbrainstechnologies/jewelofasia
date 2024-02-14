@@ -39,7 +39,7 @@ class ProductController extends Controller
         private Product $product,
         private Review $review,
         private Tag $tag,
-        private Translation $translation,
+        private Translation $translation
     ){}
 
     /**
@@ -342,13 +342,13 @@ class ProductController extends Controller
             ];
             $paypal_product_id = $paypalHelper->createProduct($paypal_product_data);
             if(in_array('weekly', $options[0])) {
-                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", 1);
+                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", "WEEK", 1);
             }
             if(in_array('bi-weekly', $options[0])) {
-                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 2);
+                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 'WEEK', 2);
             }
             if(in_array('monthly', $options[0])) {
-                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", 1);
+                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", "MONTH", 1);
             }
         }
         
@@ -563,22 +563,22 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
                 }
 
                 $variations[] = $item;
-                // $stock_count += $item['stock'];
+                $stock_count += $item['stock'];
             }
         } else {
             $stock_count = (integer)$request['total_stock'];
         }
 
-        // if ((integer)$request['total_stock'] != $stock_count) {
-        //     $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
-        // }
+        if ((integer)$request['total_stock'] != $stock_count) {
+            $validator->getMessageBag()->add('total_stock', 'Stock calculation mismatch!');
+        }
 
         if ($validator->getMessageBag()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
