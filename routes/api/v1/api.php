@@ -190,9 +190,20 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::get('/list', [OfflinePaymentMethodController::class, 'list']);
     });
 
+    Route::group(['prefix' => 'cities'], function () {
+        Route::get('/','CityController@getAllCities');
+        Route::get('/{cityId}','CityController@getCity');
+
+        Route::get('zipcodes/{cityId}','CityController@getZipcodes');
+    });
+
     Route::post('customer/change-language', [CustomerController::class, 'change_language']);
     Route::post('delivery-man/change-language', [DeliverymanController::class, 'change_language']);
 
-    Route::get('get_paypal_product', [SubscriptionController::class, 'get_products']);
+    Route::get('subscription-product-list',[SubscriptionController::class,'getSubscriptionProductList'])->name('subscription-product-list');
+    Route::get('show-product-details/{productId}',[SubscriptionController::class,'showProductDetail'])->name('show-product-details');
+    Route::get('subscription-plans-list',[SubscriptionController::class,'listSubscriptionPlans'])->name('subscription-plans-lists');
+
+    // Route::get('get_paypal_product', [SubscriptionController::class, 'get_products']);
 
 });

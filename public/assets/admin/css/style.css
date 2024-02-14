@@ -5659,6 +5659,22 @@ aside .navbar-vertical-content {
 .offline-payment--information-single {
     align-content: inherit;
 }
+/* Added by Mukesh */
 .text-wrap-normal{
   white-space: normal !important;
+}
+.value-box {
+    display: inline-block !important;
+    padding: 5px 10px;
+    margin: 5px;
+    background-color: #107980;
+    border-radius: 5px;
+    width: 65px;
+    max-width: 100% !important;
+    text-align: center;
+    color:#fff !important
+}
+.fix-width-column-zipcodes{
+  display: flex;
+  flex-wrap: wrap;
 }

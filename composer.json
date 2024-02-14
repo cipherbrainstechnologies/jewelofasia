@@ -20,7 +20,7 @@
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "gregwar/captcha": "^1.1",
-        "guzzlehttp/guzzle": "^7.0.1",
+        "guzzlehttp/guzzle": "^7.8",
         "intervention/image": "^2.5",
         "iyzico/iyzipay-php": "^2.0",
         "jenssegers/agent": "^2.6",

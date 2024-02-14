@@ -48,6 +48,7 @@ class ZipcodeController extends Controller
 
         // Put server side Validator
         $request->validate([
+            
             'zipcode.*' => 'required',
             'order_before_day' => 'required',
             'delivery_order_day' => 'required'
@@ -86,13 +87,24 @@ class ZipcodeController extends Controller
     {
         $request->validate([
             'order_before_day' => 'required',
-            'delivery_order_day' => 'required'
-
-        ],[            
+            'delivery_order_day' => 'required',
+            'zipcode.0' => 'required|unique:zipcodes,zipcode,' . $id . ',id,city_id,' . $request->city,
+        ], [
             'order_before_day.required' => 'Order before day is required',
-            'delivery_order_day.required' => 'Delivery order day is required' 
+            'delivery_order_day.required' => 'Delivery order day is required',
+            'zipcode.0.required' => 'Zipcode is required',
+            'zipcode.0.unique' => 'Zipcode must be unique within the city',
         ]);
 
+        $conflictingRecord = $this->zipcodes
+        ->where('zipcode', $request->zipcode[0])
+        ->where('city_id', '<>', $request->city)
+        ->first();
+
+        if ($conflictingRecord) {
+            return redirect()->back()->withErrors(['zipcode.0' => 'Zipcode is already assigned to a different city']);
+        }
+        
         //    Validator of zipcodes
         $zipcode = $this->zipcodes->find($id);
         $zipcode->city_id = $request->city;

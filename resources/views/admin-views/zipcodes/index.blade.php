@@ -209,10 +209,14 @@
                             @foreach($zipcodes as $key=>$zipcode)
                                 <tr>
                                     <td class="text-center">{{$zipcodes->firstItem()+$key}}</td>
-                                    <td>
-                                        <span class="d-block font-size-sm text-body text-trim-50 text-wrap-normal">
-                                            {{$zipcode['zipcode']}}
-                                        </span>
+                                    <td class="fix-width-column-zipcodes">
+                                        @if(!empty($zipcode['zipcode']))
+                                            @foreach(explode(',', $zipcode['zipcode']) as $zip)
+                                                <span class="d-block font-size-sm text-body text-trim-50 text-wrap-normal value-box">{{ $zip }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="d-block font-size-sm text-body text-trim-50 text-wrap-normal value-box">{{ $zipcode['zipcode'] }}</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <span class="d-block font-size-sm text-body text-trim-50">

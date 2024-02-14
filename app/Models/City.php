@@ -18,5 +18,10 @@ class City extends Model
         return $this->morphMany('App\Model\Translation', 'translationable');
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', '=', 'active');
+    }
+
 
 }

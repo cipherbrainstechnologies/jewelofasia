@@ -51,7 +51,8 @@ class PaypalHelper
         return json_decode($response->getBody()->getContents(), true)['access_token'];
     }
 
-    public function createProduct($data)
+// create product
+        public function createProduct($data)
     {
         $create_product = new Client();
         $response =  $create_product->post('https://api-m.sandbox.paypal.com/v1/catalogs/products', [
@@ -74,7 +75,51 @@ class PaypalHelper
         return $paypal_product->id;
     }
 
-    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count, $price)
+    // list all paypal product list
+    public function listProducts($page_size = 10, $page = 1, $total_required = "false")
+    {
+        $client = new Client();
+        $response = $client->get('https://api-m.sandbox.paypal.com/v1/catalogs/products', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Prefer' => 'return=representation',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'query' => [
+                'page_size' => $page_size,
+                'page' => $page,
+                'total_required' => $total_required,
+            ],
+        ]);
+
+        $paypalProducts = json_decode($response->getBody()->getContents(), true);
+        return $paypalProducts;
+    }
+
+
+    // Show particular paypal product detail
+    public function showProductDetail($productId)
+    {        
+        $client = new Client();
+        $response = $client->get('https://api-m.sandbox.paypal.com/v1/catalogs/products/' . $productId, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Prefer' => 'return=representation',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        $paypalProduct = json_decode($response->getBody()->getContents(), true);
+        // $paypalProduct = json_encode($response->getBody()->getContents(), true);
+        return $paypalProduct;
+    }
+
+    // Subscription 
+
+    // Create product plan
+    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count)
     {
         try {
             $create_plan = new Client();
@@ -100,7 +145,7 @@ class PaypalHelper
                         "total_cycles" => 1,
                         "pricing_scheme" => [
                             "fixed_price" => [
-                                "value" => !empty($price) ? $price : "0",
+                                "value" => "1",
                                 "currency_code" => "AUD"
                             ]
                         ]
@@ -109,7 +154,7 @@ class PaypalHelper
                 "payment_preferences" => [
                     "auto_bill_outstanding" => true,
                     "setup_fee" => [
-                        "value" => !empty($price) ? $price : "0",
+                        "value" => "0",
                         "currency_code" => "AUD"
                     ],
                     "setup_fee_failure_action" => "CONTINUE",
@@ -127,48 +172,32 @@ class PaypalHelper
             dd($e);
         }
     }
+    
 
-    public function update_plan_price($id, $price)
+    //  List out Subscription plans
+    public function listSubscriptionPlans($productId=Null,$planIds = Null,$page_size = 10, $page = 1, $total_required = "false")
     {
-        dd('https://api-m.sandbox.paypal.com/v1/billing/plans/' . $id . '/update-pricing-schemes');
-        try {
-            $create_plan = new Client();
-            $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/plans/' . $id . '/update-pricing-schemes', [
+
+        $client = new Client();
+        $response = $client->get('https://api-m.sandbox.paypal.com/v1/billing/plans', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->getToken(),
                 'Prefer' => 'return=representation',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],
-            'json' => [
-                "pricing_schemes"=> [
-                    [
-                        "billing_cycle_sequence"=> 1,
-                        "pricing_scheme"=> [
-                            "fixed_price"=> [
-                                "value"=> "10",
-                                "currency_code"=> "AUD"
-                            ],
-                        ]
-                    ],
-                    [
-                        "billing_cycle_sequence"=> 2,
-                        "pricing_scheme"=> [
-                            "fixed_price"=> [
-                                "value"=> "50",
-                                "currency_code"=> "AUD"
-                            ],
-                        ]
-                    ]
-                ]
-            ]
+            'query' => [
+                'product_id'=> $productId,
+                'plan_ids' => $planIds,
+                'page_size' => $page_size,
+                'page' => $page,
+                'total_required' => $total_required,
+            ],
         ]);
-        $paypal_plan = json_decode($response->getBody()->getContents());
-        return $paypal_plan->id;
-        } catch(Exception $e) {
-            dd($e);
-        }
-    }
 
+        $paypalSubscriptionPlans = json_decode($response->getBody()->getContents(), true);
+        
+        return $paypalSubscriptionPlans;
+    }
 
 }

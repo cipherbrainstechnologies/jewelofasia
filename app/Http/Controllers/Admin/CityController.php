@@ -42,9 +42,9 @@ class CityController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name.*' => 'required|unique:cities',
+            'name' => 'required|unique:cities',
         ],[
-            'name.*.unique' => 'The city name has already been taken.',
+            'name.unique' => 'The city name has already been taken.',
         ]);
 
         foreach ($request->name as $name) {
@@ -77,9 +77,9 @@ class CityController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name.*' => 'required|unique:cities',
+            'name' => 'required|unique:cities',
         ],[
-            'name.*.unique' => 'The city name has already been taken.',
+            'name.unique' => 'The city name has already been taken.',
         ]);
         foreach ($request->name as $name) {
             if (strlen($name) > 255) {

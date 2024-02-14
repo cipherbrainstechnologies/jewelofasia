@@ -54,30 +54,16 @@
                                             </select>
                                         </div>
 
-                                        <!-- <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form"
-                                                id="{{ $lang['code'] }}-form">
-                                            <div class="col-lg-12 ">
-                                                 <label class="form-label"
-                                                    for="exampleFormControlInput1">{{translate('zipcode')}}
-                                                ({{ strtoupper($lang['code']) }})</label>
-                                                <input type="text" name="zipcode[]" class="form-control" placeholder="{{translate('zipcode')}} "  data-role="tagsinput" oninvalid="this.setCustomValidity('Zipcode is required')" oninput="this.setCustomValidity('')"
-                                                value=" {{$zipcodes->zipcode.','}} " >
-                                            </div>
-                                        </div> -->
-                                        <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form"
-                                            id="{{ $lang['code'] }}-form">
+                                        <div class="col-sm-6 {{ $lang['default'] == false ? 'd-none' : '' }} lang_form" id="{{ $lang['code'] }}-form">
                                             <div class="col-lg-12">
-                                                <label class="form-label"
-                                                    for="exampleFormControlInput1">{{translate('zipcode')}}
-                                                    ({{ strtoupper($lang['code']) }})</label>
-                                                <input type="text" name="zipcode[]" class="form-control" placeholder="{{translate('zipcode')}}"
-                                                    data-role="tagsinput" required oninvalid="this.setCustomValidity('Zipcode is required')"
+                                                <label class="form-label" for="exampleFormControlInput1">{{ translate('zipcode') }} ({{ strtoupper($lang['code']) }})</label>
+                                                <input type="text" name="zipcode" class="form-control" placeholder="{{ translate('zipcode') }}" required
+                                                    oninvalid="this.setCustomValidity('Zipcode is required')"
                                                     oninput="this.setCustomValidity('')"
                                                     value="{{ isset($zipcodes) ? $zipcodes->zipcode : '' }}">
                                             </div>
                                         </div>
 
-                                        
                                         <div class="col-sm-6">
                                             <label for="order_before_day">{{ translate('Order Before Day') }}</label>
                                             <select name="order_before_day" class="form-control" required>

@@ -14,30 +14,25 @@ use PayPal\Api\Amount;
 use PayPal\Api\Transaction;
 use Illuminate\Support\Facades\DB;
 use PayPalCheckoutSdk\Products\ProductsCreateRequest;
+use App\CentralLogics\PaypalHelper;
 
 class SubscriptionController extends Controller
 {
-    private $apiContext;
+   private $paypalHelper;
+   public function __construct(PaypalHelper $paypalHelper){
+        $this->paypalHelper = $paypalHelper;
+   }
 
-    public function __construct()
-    {
-        $paypal = DB::table('addon_settings')->where('key_name', 'paypal')->first();
-        $live_cred = json_decode($paypal->live_values);
-        $test_cred = json_decode($paypal->test_values);
-        $client_id = ($paypal->mode === 'live') ?  $live_cred->client_id: $test_cred->client_id;
-        $secret_id = ($paypal->mode === 'live') ?  $live_cred->client_secret: $test_cred->client_secret;
-        
-        $this->apiContext = new ApiContext(
-            new OAuthTokenCredential(
-                $client_id,
-                $secret_id
-            )
-        );
-        $this->apiContext->setConfig(config('paypal.settings'));
+   public function getSubscriptionProductList(Request $request){
+        return $this->paypalHelper->listProducts();
+   }
+
+    public function showProductDetail($productId){
+        return $this->paypalHelper->showProductDetail($productId);
     }
 
-    public function get_products() 
-    {
-        dd($this->apiContext);
+    public function listSubscriptionPlans(){
+        return $this->paypalHelper->listSubscriptionPlans();
     }
+
 }
