@@ -24,7 +24,7 @@
                     <input type="number" name="price_{{ $combination['type'] }}"
                            value="{{$combination['price']}}" min="0"
                            step="any"
-                           class="form-control" required>
+                           class="form-control" disabled required>
                 </td>
                 <!-- <td>
                     <input type="number" name="stock_{{ $combination['type'] }}" value="{{ $combination['stock']??0 }}"

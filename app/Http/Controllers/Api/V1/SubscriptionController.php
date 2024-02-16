@@ -35,4 +35,9 @@ class SubscriptionController extends Controller
         return $this->paypalHelper->listSubscriptionPlans();
     }
 
+    public function add_subscription(Request $request)
+    {
+        $this->paypalHelper->add_subscription($request->plan_id);
+    }
+
 }

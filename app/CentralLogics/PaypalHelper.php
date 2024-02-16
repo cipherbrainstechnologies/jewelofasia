@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 
 class PaypalHelper
 {
@@ -52,7 +53,7 @@ class PaypalHelper
     }
 
 // create product
-        public function createProduct($data)
+    public function createProduct($data)
     {
         $create_product = new Client();
         $response =  $create_product->post('https://api-m.sandbox.paypal.com/v1/catalogs/products', [
@@ -67,12 +68,16 @@ class PaypalHelper
                 "description" => $data['description'],
                 "type" => "PHYSICAL",
                 "category" => "FOOD_PRODUCTS",
-                "image_url" => "https://img.freepik.com/free-photo/tasty-burger-isolated-white-background-fresh-hamburger-fastfood-with-beef-cheese_90220-1063.jpg?size=338&ext=jpg&ga=GA1.1.87170709.1707782400&semt=sph",
+                "image_url" => "https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=",
                 "home_url" => "https://www.jewelofasia.com.au/"
             ]
         ]);
         $paypal_product = json_decode($response->getBody()->getContents());
-        return $paypal_product->id;
+        $data = [
+            'paypal_product_id' => $paypal_product->id,
+            'paypal_access_token' => $this->getToken(),
+        ];
+        return $data;
     }
 
     // list all paypal product list
@@ -119,13 +124,13 @@ class PaypalHelper
     // Subscription 
 
     // Create product plan
-    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count)
+    public function createPlan($paypal_product_id ,$plan, $frequency, $interval_count, $price, $token)
     {
         try {
             $create_plan = new Client();
             $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/plans', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Authorization' => 'Bearer ' . $token,
                 'Prefer' => 'return=representation',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
@@ -145,7 +150,7 @@ class PaypalHelper
                         "total_cycles" => 1,
                         "pricing_scheme" => [
                             "fixed_price" => [
-                                "value" => "1",
+                                "value" => !empty($price) ? $price : "0",
                                 "currency_code" => "AUD"
                             ]
                         ]
@@ -198,6 +203,127 @@ class PaypalHelper
         $paypalSubscriptionPlans = json_decode($response->getBody()->getContents(), true);
         
         return $paypalSubscriptionPlans;
+    }
+
+    public function update_plan_price($id, $price, $token) 
+    {
+        dd($id, $token);
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ])->post('https://api-m.sandbox.paypal.com/v1/billing/plans/'.$id.'/update-pricing-schemes', [
+            "pricing_schemes" => [
+                [
+                    "billing_cycle_sequence" => 1,
+                    "pricing_scheme" => [
+                        "fixed_price" => [
+                            "value" => !empty($price) ? $price : "0",
+                            "currency_code" => "AUD"
+                        ]
+                    ]
+                ],
+            ]
+        ]);
+        
+        // Handle response
+        if ($response->successful()) {
+            // Request was successful
+            $responseData = $response->json();
+           dd($responseData);
+        } else {
+            // Request failed
+            $errorData = $response->json();
+            dd($errorData);
+            // Handle error
+        }
+    }
+
+    public function add_subscription($plan_id)
+    {
+        try {
+            $create_plan = new Client();
+            $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/subscriptions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Prefer' => 'return=representation',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                "plan_id" => $plan_id,
+                "quantity" => "1",
+                "shipping_amount" => [
+                    "currency_code" => "AUD",
+                    "value" => "10.00"
+                ],
+                "subscriber" => [
+                    "name" => [
+                        "given_name" => "John",
+                        "surname" => "Doe"
+                    ],
+                    "email_address" => "customer@example.com",
+                    "shipping_address" => [
+                        "name" => [
+                            "full_name" => "John Doe"
+                        ],
+                        "address" => [
+                            "address_line_1" => "2211 N First Street",
+                            "address_line_2" => "Building 17",
+                            "admin_area_2" => "San Jose",
+                            "admin_area_1" => "CA",
+                            "postal_code" => "95131",
+                            "country_code" => "US"
+                        ]
+                    ]
+                ],
+                "application_context" => [
+                    "brand_name" => "walmart",
+                    "locale" => "en-US",
+                    "shipping_preference" => "SET_PROVIDED_ADDRESS",
+                    "user_action" => "SUBSCRIBE_NOW",
+                    "payment_method" => [
+                        "payer_selected" => "PAYPAL",
+                        "payee_preferred" => "IMMEDIATE_PAYMENT_REQUIRED"
+                    ],
+                    "return_url" => "https://example.com/returnUrl",
+                    "cancel_url" => "https://example.com/cancelUrl"
+                ]
+            ]
+        ]);
+        // dd(11);
+        $paypal_plan = json_decode($response->getBody()->getContents());
+        dd($paypal_plan);
+        return $paypal_plan->id;
+        } catch(Exception $e) {
+            dd($e);
+        }
+    }
+
+    public function update_product($id, $data, $token)
+    {
+        // dd($id, $data, $token);
+        $create_product = new Client();
+        $response =  $create_product->patch('https://api-m.sandbox.paypal.com/v1/catalogs/products/'. $id, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Prefer' => 'return=representation',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                [
+                    "op" => "replace",
+                    "path" => "/name",
+                    "value" => $data['name']
+                ],
+                [
+                    "op" => "replace",
+                    "path" => "/description",
+                    "value" => $data['description']
+                ],
+            ]
+        ]);
     }
 
 }

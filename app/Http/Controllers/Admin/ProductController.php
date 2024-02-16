@@ -340,15 +340,15 @@ class ProductController extends Controller
                 'name' => $request->name[array_search('en', $request->lang)],
                 'description' => $request->description[array_search('en', $request->lang)],
             ];
-            $paypal_product_id = $paypalHelper->createProduct($paypal_product_data);
+            $paypal_product = $paypalHelper->createProduct($paypal_product_data);
             if(in_array('weekly', $options[0])) {
-                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Weekly", "WEEK", 1, $this->getPriceByType($variations, 'weekly'));
+                $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Weekly", "WEEK", 1, $this->getPriceByType($variations, 'weekly'), $paypal_product['paypal_access_token']);
             }
             if(in_array('bi-weekly', $options[0])) {
-                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Biweekly", 'WEEK', 2, $this->getPriceByType($variations, 'bi-weekly'));
+                $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Biweekly", 'WEEK', 2, $this->getPriceByType($variations, 'bi-weekly'), $paypal_product['paypal_access_token']);
             }
             if(in_array('monthly', $options[0])) {
-                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product_id ,"Monthly", "MONTH", 1, $this->getPriceByType($variations, 'monthly'));
+                $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Monthly", "MONTH", 1, $this->getPriceByType($variations, 'monthly'), $paypal_product['paypal_access_token']);
             }
         }
         
@@ -356,6 +356,7 @@ class ProductController extends Controller
         $p->paypal_weekly_plan_id = $paypal_weekly_plan_id;
         $p->paypal_biweekly_plan_id = $paypal_biweekly_plan_id;
         $p->paypal_monthly_plan_id = $paypal_monthly_plan_id;
+        $p->paypal_access_token = $paypal_product['paypal_access_token'];
         $p->save();
 
         $p->tags()->sync($tag_ids);
@@ -610,18 +611,23 @@ class ProductController extends Controller
         $product = $this->product->withoutGlobalScopes()->with('translations')->find($id);
         // dd($options);
 
-        // if(!empty($request->choice) && in_array('subscription', $request->choice)) {
-        //     $paypalHelper = new PaypalHelper();
-        //     if(in_array('weekly', $options[0])) {
-        //         $paypal_weekly_plan_id = $paypalHelper->update_plan_price($product->paypal_weekly_plan_id, $this->getPriceByType($variations, 'weekly'));
-        //     }
-        //     if(in_array('bi-weekly', $options[0])) {
-        //         $paypal_biweekly_plan_id = $paypalHelper->update_plan_price($product->paypal_biweekly_plan_id, $this->getPriceByType($variations, 'bi-weekly'));
-        //     }
-        //     if(in_array('monthly', $options[0])) {
-        //         $paypal_monthly_plan_id = $paypalHelper->update_plan_price($product->paypal_monthly_plan_id, $this->getPriceByType($variations, 'monthly'));
-        //     }
-        // }
+        if(!empty($request->choice) && in_array('subscription', $request->choice)) {
+            $paypalHelper = new PaypalHelper();
+             $update_data = [
+                'name' => $request->name[array_search('en', $request->lang)],
+                'description' => $request->description[array_search('en', $request->lang)],
+            ];
+            $paypalHelper->update_product($product->paypal_product_id, $update_data, $product->paypal_access_token);
+            // if(in_array('weekly', $options[0])) {
+            //     $paypal_weekly_plan_id = $paypalHelper->update_plan_price($product->paypal_weekly_plan_id, $this->getPriceByType($variations, 'weekly'), $product->paypal_access_token);
+            // }
+            // if(in_array('bi-weekly', $options[0])) {
+            //     $paypal_biweekly_plan_id = $paypalHelper->update_plan_price($product->paypal_biweekly_plan_id, $this->getPriceByType($variations, 'bi-weekly'), $product->paypal_access_token);
+            // }
+            // if(in_array('monthly', $options[0])) {
+            //     $paypal_monthly_plan_id = $paypalHelper->update_plan_price($product->paypal_monthly_plan_id, $this->getPriceByType($variations, 'monthly'), $product->paypal_access_token);
+            // }
+        }
 
         $p->save();
 

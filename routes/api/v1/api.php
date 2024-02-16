@@ -204,6 +204,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
     Route::get('show-product-details/{productId}',[SubscriptionController::class,'showProductDetail'])->name('show-product-details');
     Route::get('subscription-plans-list',[SubscriptionController::class,'listSubscriptionPlans'])->name('subscription-plans-lists');
 
+    Route::post('add-subscription-plans',[SubscriptionController::class,'add_subscription']);
     // Route::get('get_paypal_product', [SubscriptionController::class, 'get_products']);
 
 });
