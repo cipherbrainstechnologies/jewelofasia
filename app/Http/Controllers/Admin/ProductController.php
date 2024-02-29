@@ -341,11 +341,14 @@ class ProductController extends Controller
                 'description' => $request->description[array_search('en', $request->lang)],
             ];
             $paypal_product = $paypalHelper->createProduct($paypal_product_data);
+            $paypal_product_id = $paypal_product['paypal_product_id'];
             if(in_array('weekly', $options[0])) {
                 $paypal_weekly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Weekly", "WEEK", 1, $this->getPriceByType($variations, 'weekly'), $paypal_product['paypal_access_token']);
+                $paypalHelper->active_plan($paypal_weekly_plan_id);
             }
             if(in_array('bi-weekly', $options[0])) {
                 $paypal_biweekly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Biweekly", 'WEEK', 2, $this->getPriceByType($variations, 'bi-weekly'), $paypal_product['paypal_access_token']);
+                $paypalHelper->active_plan($paypal_weekly_plan_id);
             }
             if(in_array('monthly', $options[0])) {
                 $paypal_monthly_plan_id = $paypalHelper->createPlan($paypal_product['paypal_product_id'] ,"Monthly", "MONTH", 1, $this->getPriceByType($variations, 'monthly'), $paypal_product['paypal_access_token']);
