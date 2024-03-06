@@ -12,12 +12,10 @@ use Brian2694\Toastr\Facades\Toastr;
 
 class ZipcodeController extends Controller
 {
-    private $zipcodes;
 
-    public function __construct(Zipcodes $zipcodes
-    ){
-        $this->zipcodes = $zipcodes;
-    }
+    public function __construct(
+        private Zipcodes $zipcodes
+    ){}
 
     public function index(Request $request)
     {
