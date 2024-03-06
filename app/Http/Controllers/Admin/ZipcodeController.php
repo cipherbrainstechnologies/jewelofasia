@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Zipcodes;
+use App\Models\ZipCodes;
 use App\Models\City;
 use App\CentralLogics\Helpers;
 use Brian2694\Toastr\Facades\Toastr;
@@ -14,7 +14,7 @@ class ZipcodeController extends Controller
 {
 
     public function __construct(
-        private Zipcodes $zipcodes
+        private ZipCodes $zipcodes
     ){}
 
     public function index(Request $request)

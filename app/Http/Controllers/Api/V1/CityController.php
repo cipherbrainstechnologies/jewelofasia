@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\City;
-use App\Models\Zipcodes;
+use App\Models\ZipCodes;
 
 class CityController extends Controller
 {
 
     public function __construct(
         private City $city,
-        private Zipcodes $zipcode
+        private ZipCodes $zipcode
     ){}
 
     public function getAllCities(Request $request){
