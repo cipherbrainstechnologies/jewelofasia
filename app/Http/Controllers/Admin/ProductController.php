@@ -359,7 +359,7 @@ class ProductController extends Controller
         $p->paypal_weekly_plan_id = $paypal_weekly_plan_id;
         $p->paypal_biweekly_plan_id = $paypal_biweekly_plan_id;
         $p->paypal_monthly_plan_id = $paypal_monthly_plan_id;
-        $p->paypal_access_token = $paypal_product['paypal_access_token'];
+        $p->paypal_access_token = !empty( $paypal_product['paypal_access_token']) ?  $paypal_product['paypal_access_token'] : null;
         $p->save();
 
         $p->tags()->sync($tag_ids);
