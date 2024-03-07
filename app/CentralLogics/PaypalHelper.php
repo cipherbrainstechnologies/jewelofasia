@@ -306,7 +306,7 @@ class PaypalHelper
         $create_product = new Client();
         $response =  $create_product->patch('https://api-m.sandbox.paypal.com/v1/catalogs/products/'. $id, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => 'Bearer ' . $this->getToken(),
                 'Prefer' => 'return=representation',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',

@@ -5678,3 +5678,7 @@ aside .navbar-vertical-content {
   display: flex;
   flex-wrap: wrap;
 }
+
+.disabled-input {
+  background-color: #dadada !important;
+}

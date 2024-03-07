@@ -30,6 +30,7 @@ use Intervention\Image\Facades\Image;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\CentralLogics\PaypalHelper;
+use App\Model\Attribute;
 
 class ProductController extends Controller
 {
@@ -404,7 +405,14 @@ class ProductController extends Controller
         $product = $this->product->withoutGlobalScopes()->with('translations')->find($id);
         $product_category = json_decode($product->category_ids);
         $categories = $this->category->where(['parent_id' => 0])->get();
-        return view('admin-views.product.edit', compact('product', 'product_category', 'categories'));
+        $variations = json_decode($product->variations);
+        $subscriptionPlan = ['weekly', 'bi-weekly', 'monthly'];
+        foreach($variations as $variation) {
+            $isSubscriptionProduct = in_array($variation->type, $subscriptionPlan) ? 1 : 0;
+            $variation->isSubscriptionProduct = $isSubscriptionProduct;
+        }
+        $product->variations = json_encode($variations);
+        return view('admin-views.product.edit', compact('product', 'product_category', 'categories', 'isSubscriptionProduct'));
     }
 
     /**
@@ -929,6 +937,22 @@ class ProductController extends Controller
             }
         }
         return null;
+    }
+
+    public function get_attribute_name($ids) {
+        $get_name = Attribute::select('name')->whereIn('id', $ids)->get()->toArray();
+        return $get_name;
+    }
+
+    public function filter_array($data) 
+    {
+        $result = array_map(function($item) {
+            unset($item['translations']);
+            return $item['name'];
+        }, $data);
+
+        return $result;
+        
     }
 
 }
