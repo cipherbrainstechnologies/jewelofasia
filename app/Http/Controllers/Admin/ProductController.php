@@ -290,7 +290,7 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
@@ -406,12 +406,14 @@ class ProductController extends Controller
         $product_category = json_decode($product->category_ids);
         $categories = $this->category->where(['parent_id' => 0])->get();
         $variations = json_decode($product->variations);
+        // dd($product);
         $subscriptionPlan = ['weekly', 'bi-weekly', 'monthly'];
         foreach($variations as $variation) {
             $isSubscriptionProduct = in_array($variation->type, $subscriptionPlan) ? 1 : 0;
             $variation->isSubscriptionProduct = $isSubscriptionProduct;
         }
         $product->variations = json_encode($variations);
+        // dd($product);
         return view('admin-views.product.edit', compact('product', 'product_category', 'categories'));
     }
 
@@ -575,7 +577,7 @@ class ProductController extends Controller
                 $item = [];
                 $item['type'] = $str;
                 $item['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
-                // $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
+                $item['stock'] = abs($request['stock_' . str_replace('.', '_', $str)]);
 
                 if ($request['discount_type'] == 'amount' && $item['price'] <= $request['discount'] ){
                     $validator->getMessageBag()->add('discount_mismatch', 'Discount can not be more or equal to the price. Please change variant '. $item['type'] .' price or change discount amount!');
