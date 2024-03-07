@@ -8,9 +8,9 @@
             <td class="text-center">
                 <label for="" class="control-label">{{ translate('Variant Price') }}</label>
             </td>
-            <!-- <td class="text-center">
+            <td class="text-center">
                 <label for="" class="control-label">{{ translate('Variant Stock') }}</label>
-            </td> -->
+            </td>
         </tr>
         </thead>
         <tbody>
@@ -26,11 +26,11 @@
                            step="any"
                            class="{{ !empty($combination['isSubscriptionProduct']) ? 'disabled-input' : '' }} form-control" {{ !empty($combination['isSubscriptionProduct']) ? 'readonly' : '' }} required>
                 </td>
-                <!-- <td>
+                <td>
                     <input type="number" name="stock_{{ $combination['type'] }}" value="{{ $combination['stock']??0 }}"
                            min="0" max="1000000" onkeyup="update_qty()"
                            class="form-control" required>
-                </td> -->
+                </td>
             </tr>
         @endforeach
         </tbody>
