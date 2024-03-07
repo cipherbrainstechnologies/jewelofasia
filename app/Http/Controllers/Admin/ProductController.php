@@ -412,7 +412,7 @@ class ProductController extends Controller
             $variation->isSubscriptionProduct = $isSubscriptionProduct;
         }
         $product->variations = json_encode($variations);
-        return view('admin-views.product.edit', compact('product', 'product_category', 'categories', 'isSubscriptionProduct'));
+        return view('admin-views.product.edit', compact('product', 'product_category', 'categories'));
     }
 
     /**
