@@ -36,6 +36,7 @@
                         <input type="number" name="price_{{ $str }}" value="{{ $price }}" min="0" step="any"
                                class="form-control" required>
                     </td>
+                    <td>
                         <input type="number" name="stock_{{ $str }}" value="0" min="0" max="1000000"
                                class="form-control" onkeyup="update_qty()" required>
                     </td>
