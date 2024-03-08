@@ -107,9 +107,10 @@ class CityController extends Controller
                     $expectedDates[$key] = $today->next($dayMappings[$day])->format('Y-m-d') .' '.$today->next($dayMappings[$day])->format('l').')';
                 }
             } else {
-                $nextweek = $today->next($dayMappings[$orderBeforeDay]);
+                $nextWeek = $today->next($orderBeforeDay);
                 foreach ($deliveryDays as $key => $day) {
-                    $expectedDates[$key] = $nextweek->next($dayMappings[$day])->format('Y-m-d').' ('.$today->next($dayMappings[$day])->format('l').')';
+                    $nextDeliveryDate = $nextWeek->next($day);
+                    $expectedDates[$key] =   $nextDeliveryDate->format('Y-m-d').' ('.$nextDeliveryDate->format('l').')';
                 }
             }
             return response()->json(['expected_dates' => $expectedDates], 200);
