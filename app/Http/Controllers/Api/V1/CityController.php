@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\City;
 use App\Models\ZipCodes;
+use Carbon\Carbon;
 
 class CityController extends Controller
 {
@@ -41,4 +42,78 @@ class CityController extends Controller
             return response()->json([], 200);
         }
     }
+
+    // public function DeliveryDetail($cityId,$zipcode){
+    //     $today = now();
+    //     $cityDetail = $this->city->with('zipcodes')->find($cityId);
+    //     $expectedDates = [];
+    //     if(!empty($cityDetail)){
+    //        $deliveryDays = explode(',',$cityDetail->zipcodes[0]['delivery_order_day']);
+    //        echo "<pre>";print_r($deliveryDays);
+    //        $orderBeforeDay = strtolower($cityDetail->zipcodes[0]['order_before_day']);
+
+    //         $dayMappings = [
+    //             'sunday' => Carbon::SUNDAY,
+    //             'monday' => Carbon::MONDAY,
+    //             'tuesday' => Carbon::TUESDAY,
+    //             'wednesday' => Carbon::WEDNESDAY,
+    //             'thursday' => Carbon::THURSDAY,
+    //             'friday' => Carbon::FRIDAY,
+    //             'saturday' => Carbon::SATURDAY,
+    //         ];
+
+    //         $carbonDay = $dayMappings[$orderBeforeDay] ?? null;
+
+    //         // $inputCarbon = Carbon::parse($inputDate);
+    //         if ($today->dayOfWeek < $dayMappings[$orderBeforeDay]) {
+    //             foreach ($deliveryDays as $key => $day) {
+    //                 $expectedDates[$key] = $today->next(ucfirst($day))->format('Y-m-d');
+    //             }
+                
+    //         } else {
+    //             foreach ($deliveryDays as $key => $day) {
+    //                 $expectedDates[$key] = $today->next(ucfirst($day))->addWeek()->format('Y-m-d');
+    //             }
+    //         }
+    //         echo "<pre>";print_r($expectedDates);die;
+
+    //     }
+    // }
+    public function DeliveryDetail($cityId, $zipcode)
+    {
+        $today = now();
+        $cityDetail = $this->city->with('zipcodes')->find($cityId);
+        $expectedDates = [];
+
+        if (!empty($cityDetail)) {
+            $deliveryDays = explode(',', $cityDetail->zipcodes[0]['delivery_order_day']);
+            $orderBeforeDay = strtolower($cityDetail->zipcodes[0]['order_before_day']);
+
+            $dayMappings = [
+                'sunday' => Carbon::SUNDAY,
+                'monday' => Carbon::MONDAY,
+                'tuesday' => Carbon::TUESDAY,
+                'wednesday' => Carbon::WEDNESDAY,
+                'thursday' => Carbon::THURSDAY,
+                'friday' => Carbon::FRIDAY,
+                'saturday' => Carbon::SATURDAY,
+            ];
+
+            $carbonDay = $dayMappings[$orderBeforeDay] ?? null;
+
+            // Check if today is before the order before day
+            if ($today->dayOfWeek < $dayMappings[$orderBeforeDay]) {
+                foreach ($deliveryDays as $key => $day) {
+                    $expectedDates[$key] = $today->next($dayMappings[$day])->format('Y-m-d') .' '.$today->next($dayMappings[$day])->format('l').')';
+                }
+            } else {
+                $nextweek = $today->next($dayMappings[$orderBeforeDay]);
+                foreach ($deliveryDays as $key => $day) {
+                    $expectedDates[$key] = $nextweek->next($dayMappings[$day])->format('Y-m-d').' ('.$today->next($dayMappings[$day])->format('l').')';
+                }
+            }
+            return response()->json(['expected_dates' => $expectedDates], 200);
+        }
+    }
+
 }

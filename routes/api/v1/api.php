@@ -195,6 +195,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::get('/{cityId}','CityController@getCity');
 
         Route::get('zipcodes/{cityId}','CityController@getZipcodes');
+        Route::get('/{cityId}/{zipcode}','CityController@DeliveryDetail');
     });
 
     Route::post('customer/change-language', [CustomerController::class, 'change_language']);

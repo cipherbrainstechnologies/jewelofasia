@@ -23,5 +23,10 @@ class City extends Model
         return $query->where('status', '=', 'active');
     }
 
+    public function zipcodes()
+    {
+        return $this->hasMany('App\Models\Zipcodes', 'city_id', 'id');
+    }
+
 
 }
