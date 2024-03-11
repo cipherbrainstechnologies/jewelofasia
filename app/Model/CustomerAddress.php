@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerAddress extends Model
 {
     protected $casts = [
+        'city' => 'integer',
         'user_id' => 'integer',
         'is_guest' => 'integer',
         'created_at' => 'datetime',
