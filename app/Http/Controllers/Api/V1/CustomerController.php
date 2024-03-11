@@ -78,6 +78,8 @@ class CustomerController extends Controller
                 'floor' => $request->floor,
                 'longitude' => $request->longitude,
                 'latitude' => $request->latitude,
+                'city' => $request->city,
+                'zipcode_id' => $request->zipcode,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
