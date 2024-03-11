@@ -11,7 +11,8 @@ class CustomerAddress extends Model
         'user_id' => 'integer',
         'is_guest' => 'integer',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        "zipcode_id" => 'string'
     ];
 
     protected $fillable = [
