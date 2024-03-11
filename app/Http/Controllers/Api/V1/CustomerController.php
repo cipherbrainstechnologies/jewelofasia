@@ -42,7 +42,19 @@ class CustomerController extends Controller
         $user_id = (bool)auth('api')->user() ? auth('api')->user()->id : $request->header('guest-id');
         $user_type = (bool)auth('api')->user() ? 0 : 1;
 
-        return response()->json($this->customer_address->where(['user_id' => $user_id, 'is_guest' => $user_type])->latest()->get(), 200);
+        // return response()->json($this->customer_address->where(['user_id' => $user_id, 'is_guest' => $user_type])->latest()->get(), 200);
+        $addresses = $this->customer_address
+        ->where(['user_id' => $user_id, 'is_guest' => $user_type])
+        ->latest()
+        ->get();
+
+        $addresses->transform(function ($address) {
+            $address['zipcode'] = $address['zipcode_id'];
+            unset($address['zipcode_id']);
+            return $address;
+        });
+
+        return response()->json($addresses, 200);
     }
 
     /**
