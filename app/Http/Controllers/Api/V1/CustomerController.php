@@ -81,7 +81,7 @@ class CustomerController extends Controller
                 'city' => $request->city,
                 'zipcode_id' => $request->zipcode,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now() 
             ];
             DB::table('customer_addresses')->insert($address);
             return response()->json(['message' => 'successfully added!'], 200);
