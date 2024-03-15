@@ -10,15 +10,23 @@ use App\Library\Payer;
 use App\Library\Payment as PaymentInfo;
 use App\Library\Receiver;
 use App\Traits\Payment;
+use Mpdf\Tag\Em;
+use App\CentralLogics\PaypalHelper;
+use App\Models\userSubscription;
+
 use function App\CentralLogics\translate;
 
 class PaymentController extends Controller
 {
-    public function __construct(){
+    private $paypalHelper;
+
+    public function __construct(PaypalHelper $paypalHelper){
 
         if (is_dir('App\Traits') && trait_exists('App\Traits\Payment')) {
             $this->extendWithPaymentGatewayTrait();
         }
+
+        $this->paypalHelper = $paypalHelper;
     }
 
     private function extendWithPaymentGatewayTrait()
@@ -188,6 +196,60 @@ class PaymentController extends Controller
         $receiver_info = new Receiver('receiver_name','example.png');
         $redirect_link = Payment::generate_link($payer, $payment_info, $receiver_info);
         return redirect($redirect_link);
+    }
+
+    public function subscription_payment(Request $request)
+    {
+        if (session()->has('payment_method') == false) {
+            session()->put('payment_method', 'ssl_commerz');
+        }
+
+        $params = explode('&&', base64_decode($request['token']));
+        // dd($params);
+        $param_array = [];
+
+        foreach ($params as $param) {
+            $data = explode('=', $param);
+            $param_array[$data[0]] = $data[1];
+        }
+        // dd($param_array);
+        $customer_id = !empty($param_array['customer_id']) ? $param_array['customer_id'] : '';
+        $plan_id = !empty($param_array['plan_id']) ? $param_array['plan_id'] : '';
+        $paypal_product_id = !empty($param_array['paypal_product_id']) ? $param_array['paypal_product_id'] : '';
+        $quantity = !empty($param_array['quantity']) ? $param_array['quantity'] : 1;
+        $deliveryCharge = !empty($param_array['deliveryCharge']) ? $param_array['deliveryCharge'] : 0;
+        $customer = User::find($customer_id);
+        $address = CustomerAddress::where('user_id', $customer_id)->first();
+        // dd($address);
+        $payment_info = [
+            'quantity' => $quantity,
+            'shipping_amount' => $deliveryCharge,
+            'given_name' => !empty($customer['f_name']) ? $customer['f_name'] : '',
+            'surname' => !empty($customer['l_name']) ? $customer['l_name'] : '',
+            'email_address' => !empty($customer['email']) ? $customer['email'] : '',
+            'full_name' => (!empty($customer['f_name']) ? $customer['f_name'] : '') . ' ' .  (!empty($customer['l_name']) ? $customer['l_name'] : ''), 
+            'postal_code' => !empty($address['zipcode_id']) ? $address['zipcode_id'] : '',
+            'address' => !empty($address['address']) ? $address['address'] : '',
+        ];
+        
+
+
+        $res = $this->paypalHelper->add_subscription($plan_id, $payment_info);
+        $user_subscription_data = [
+            'user_id' => $customer_id,
+            'plan_id' => $plan_id,
+            'paypal_product_id' => $paypal_product_id,
+            'subscription_id' => !empty($res->id) ? $res->id : '',
+            'status' => 1
+        ];
+        
+        userSubscription::create($user_subscription_data);
+
+        if(!empty($res->links[0]->href)) {
+            return redirect($res->links[0]->href);
+        } else {
+            echo "somethig want to wrong";
+        }
     }
 
     public function success()

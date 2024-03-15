@@ -23,6 +23,7 @@ class PaypalHelper
     protected $client;
     protected $client_id;
     protected $secret_id;
+    private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
 
     public function __construct()
     {
@@ -239,8 +240,9 @@ class PaypalHelper
         }
     }
 
-    public function add_subscription($plan_id)
+    public function add_subscription($plan_id, $data)
     {
+        // dd($data);
         try {
             $create_plan = new Client();
             $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/subscriptions', [
@@ -252,28 +254,28 @@ class PaypalHelper
             ],
             'json' => [
                 "plan_id" => $plan_id,
-                "quantity" => "1",
+                "quantity" => $data['quantity'],
                 "shipping_amount" => [
                     "currency_code" => "AUD",
-                    "value" => "10.00"
+                    "value" => $data['shipping_amount']
                 ],
                 "subscriber" => [
                     "name" => [
-                        "given_name" => "John",
-                        "surname" => "Doe"
+                        "given_name" => $data['given_name'],
+                        "surname" => $data['surname']
                     ],
-                    "email_address" => "customer@example.com",
+                    "email_address" => $data['email_address'],
                     "shipping_address" => [
                         "name" => [
-                            "full_name" => "John Doe"
+                            "full_name" => $data['full_name']
                         ],
                         "address" => [
-                            "address_line_1" => "2211 N First Street",
-                            "address_line_2" => "Building 17",
-                            "admin_area_2" => "San Jose",
-                            "admin_area_1" => "CA",
-                            "postal_code" => "95131",
-                            "country_code" => "US"
+                            "address_line_1" => $data['address'],
+                            "address_line_2" => "",
+                            "admin_area_2" => "",
+                            "admin_area_1" => "",
+                            "postal_code" =>  $data['postal_code'],
+                            "country_code" => "AU"
                         ]
                     ]
                 ],
@@ -286,17 +288,16 @@ class PaypalHelper
                         "payer_selected" => "PAYPAL",
                         "payee_preferred" => "IMMEDIATE_PAYMENT_REQUIRED"
                     ],
-                    "return_url" => "https://example.com/returnUrl",
+                    "return_url" => $this->front_url,
                     "cancel_url" => "https://example.com/cancelUrl"
                 ]
             ]
         ]);
-        // dd(11);
-        $paypal_plan = json_decode($response->getBody()->getContents());
-        dd($paypal_plan);
-        return $paypal_plan->id;
+        $paypal_response = json_decode($response->getBody()->getContents());
+        return $paypal_response;
+        
         } catch(Exception $e) {
-            dd($e);
+            print_r($e->getMessage());
         }
     }
 

@@ -40,6 +40,7 @@ Route::get('authentication-failed', function () {
 
 Route::group(['prefix' => 'payment-mobile'], function () {
     Route::get('/', 'PaymentController@payment')->name('payment-mobile');
+    Route::get('subscription', 'PaymentController@subscription_payment')->name('payment-mobile-subscription');
     Route::get('set-payment-method/{name}', 'PaymentController@set_payment_method')->name('set-payment-method');
 });
 
