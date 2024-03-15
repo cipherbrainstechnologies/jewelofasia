@@ -104,6 +104,8 @@ class Helpers
                         }
                     }
                 }
+                $is_subscription_product = ($item['paypal_weekly_plan_id'] || $item['paypal_biweekly_plan_id'] || $item['paypal_monthly_plan_id'] ) ? 1 : 0;
+                $item['is_subscription_product'] = $is_subscription_product;
                 unset($item['translations']);
                 array_push($storage, $item);
             }
@@ -121,6 +123,9 @@ class Helpers
             $data['choice_options'] = gettype($data['choice_options']) == 'array' ? $data['choice_options'] : json_decode($data['choice_options']);
 
             $categories = gettype($data['category_ids']) == 'array' ? $data['category_ids'] : json_decode($data['category_ids'], true);
+
+            $is_subscription_product = ($data['paypal_weekly_plan_id'] || $data['paypal_biweekly_plan_id'] || $data['paypal_monthly_plan_id'] ) ? 1 : 0;
+            $data['is_subscription_product'] = $is_subscription_product;
 
             if(!is_null($categories) && count($categories) > 0) {
                 $ids = [];
