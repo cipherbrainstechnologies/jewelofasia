@@ -455,6 +455,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('subscribed-emails', 'CustomerController@subscribed_emails')->name('subscribed_emails');
             Route::delete('delete/{id}', 'CustomerController@delete')->name('delete');
             Route::get('status/{id}/{status}', 'CustomerController@status')->name('status');
+            Route::get('cancel-subscription/{id}', 'CustomerController@cancel_subscription')->name('cancel_subscription');
             Route::get('export', 'CustomerController@export_customer')->name('export');
 
             Route::get('select-list', 'CustomerWalletController@get_customers')->name('select-list');

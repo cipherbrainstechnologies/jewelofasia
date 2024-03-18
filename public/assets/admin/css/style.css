@@ -5682,3 +5682,7 @@ aside .navbar-vertical-content {
 .disabled-input {
   background-color: #dadada !important;
 }
+
+.adm-subscription-list {
+  margin-top: -20rem;
+}

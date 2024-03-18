@@ -254,7 +254,7 @@ class PaypalHelper
                 ],
                 'json' => [
                     "plan_id" => $plan_id,
-                    "start_time"=> $data['start_date'],
+                    "start_time" => $data['start_date'],
                     "quantity" => $data['quantity'],
                     "shipping_amount" => [
                         "currency_code" => "AUD",
@@ -303,7 +303,6 @@ class PaypalHelper
 
     public function update_product($id, $data, $token)
     {
-        // dd($id, $data, $token);
         $create_product = new Client();
         $response =  $create_product->patch('https://api-m.sandbox.paypal.com/v1/catalogs/products/' . $id, [
             'headers' => [
@@ -327,11 +326,11 @@ class PaypalHelper
         ]);
     }
 
-    public function change_url($id, $url)
+    public function cancel_subscription($id)
     {
         try {
-            $url_change = new Client();
-            $response =  $url_change->patch('https://api-m.sandbox.paypal.com/v1/billing/subscriptions/'.$id, [
+            $subscription = new Client();
+            $response =  $subscription->post('https://api-m.sandbox.paypal.com/v1/billing/subscriptions/' . $id . '/cancel', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->getToken(),
                     'Prefer' => 'return=representation',
@@ -339,16 +338,11 @@ class PaypalHelper
                     'Accept' => 'application/json',
                 ],
                 'json' => [
-                    [
-                        "op"=> "replace",
-                        "path"=> "/plan/return_url",
-                        "value"=> $url,
-                    ],
+                    "reason" => "Not satisfied with the service"
                 ]
             ]);
         } catch (Exception $e) {
-            // Handle exceptions
-           dd($e->getMessage());
-        } 
+           print_r($e->getMessage());
+        }
     }
 }
