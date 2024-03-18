@@ -9,5 +9,5 @@ class userSubscription extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'plan_id', 'paypal_product_id', 'subscription_id', 'status'];
+    protected $fillable = ['user_id', 'plan_id', 'paypal_product_id', 'subscription_id', 'status', 'order_id'];
 }
