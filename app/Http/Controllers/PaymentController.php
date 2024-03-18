@@ -220,6 +220,7 @@ class PaymentController extends Controller
         $deliveryCharge = !empty($param_array['deliveryCharge']) ? $param_array['deliveryCharge'] : 0;
         $customer = User::find($customer_id);
         $address = CustomerAddress::where('user_id', $customer_id)->first();
+        $start_date = !empty($param_array['start_date']) ? $param_array['start_date'] : null;
         // dd($address);
         $payment_info = [
             'quantity' => $quantity,
@@ -230,6 +231,7 @@ class PaymentController extends Controller
             'full_name' => (!empty($customer['f_name']) ? $customer['f_name'] : '') . ' ' .  (!empty($customer['l_name']) ? $customer['l_name'] : ''), 
             'postal_code' => !empty($address['zipcode_id']) ? $address['zipcode_id'] : '',
             'address' => !empty($address['address']) ? $address['address'] : '',
+            'start_date' => $start_date
         ];
         
 
