@@ -12,14 +12,18 @@ use App\Library\Receiver;
 use App\Traits\Payment;
 use Mpdf\Tag\Em;
 use App\CentralLogics\PaypalHelper;
+use App\Model\Order;
 use App\Models\userSubscription;
+use App\Model\OrderDetail;
+use App\Model\Product;
+use Carbon\Carbon;
 
 use function App\CentralLogics\translate;
 
 class PaymentController extends Controller
 {
     private $paypalHelper;
-
+    private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
     public function __construct(PaypalHelper $paypalHelper){
 
         if (is_dir('App\Traits') && trait_exists('App\Traits\Payment')) {
@@ -108,7 +112,6 @@ class PaymentController extends Controller
             'business_name' => Helpers::get_business_settings('restaurant_name') ?? '',
             'business_logo' => asset('storage/app/public/restaurant/' . Helpers::get_business_settings('logo'))
         ];
-
         //add fund to wallet
         $is_add_fund = $request['is_add_fund'];
         if ($is_add_fund == 1) {
@@ -221,6 +224,7 @@ class PaymentController extends Controller
         $customer = User::find($customer_id);
         $address = CustomerAddress::where('user_id', $customer_id)->first();
         $start_date = !empty($param_array['start_date']) ? $param_array['start_date'] : null;
+        $order_amount = !empty($param_array['order_amount']) ? $param_array['order_amount'] : 0;
         // dd($address);
         $payment_info = [
             'quantity' => $quantity,
@@ -234,7 +238,43 @@ class PaymentController extends Controller
             'start_date' => $start_date
         ];
         
+        $order = new Order();
+        $order->user_id = $customer_id;
+        $order->is_guest = 0;
+        $order->order_amount = $order_amount;
+        $order->order_status = 'paid';
+        $order->order_status = 'confirmed';
+        $order->payment_method = 'paypal';
+        $order->delivery_address_id = !empty($address['id']) ? $address['id'] : null;
+        $order->created_at = Carbon::createFromFormat('Y-m-d H:i:s', now());
+        $order->updated_at = Carbon::createFromFormat('Y-m-d H:i:s', now());
+        $order->checked = 1;
+        $order->delivery_charge = !empty($deliveryCharge) ? $deliveryCharge : 0;
+        $order->order_type = 'delivery';
+        $order->branch_id = 1;
+        $order->date = Carbon::parse(now())->format('Y-m-d');
+        $order->delivery_date = !empty($start_date) ? Carbon::parse($start_date)->format('Y-m-d') : null;
+        $order->delivery_address = json_encode($address->toArray());
 
+        $order->save();
+        $product = Product::where('paypal_product_id', $paypal_product_id)->first();
+        if(!empty($order->id)) {
+            $order_detail = new OrderDetail();
+            $order_detail->order_id = $order->id;
+            $order_detail->product_id = !empty($product->id) ? $product->id : null;
+            $order_detail->price = $order_amount;
+            $order_detail->product_details = json_encode($product->toArray());
+            $order_detail->variation = $product->variations;
+            $order_detail->discount_type = 'discount_on_category';
+            $order_detail->quantity = $quantity;
+            $order_detail->created_at = Carbon::createFromFormat('Y-m-d H:i:s', now());
+            $order_detail->updated_at = Carbon::createFromFormat('Y-m-d H:i:s', now());
+            $order_detail->unit = $product->unit;
+            $order_detail->save();
+        }
+
+        $url = $this->front_url .'order-successful/'.$order->id.'/success';
+        $payment_info['url'] = $url;
 
         $res = $this->paypalHelper->add_subscription($plan_id, $payment_info);
         $user_subscription_data = [
@@ -242,11 +282,14 @@ class PaymentController extends Controller
             'plan_id' => $plan_id,
             'paypal_product_id' => $paypal_product_id,
             'subscription_id' => !empty($res->id) ? $res->id : '',
+            'order_id' => $order->id,
             'status' => 1
         ];
         
         userSubscription::create($user_subscription_data);
-
+        $order = Order::find($order->id);
+        $order->transaction_reference = $res->id;
+        
         if(!empty($res->links[0]->href)) {
             return redirect($res->links[0]->href);
         } else {

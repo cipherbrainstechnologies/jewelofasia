@@ -243,7 +243,6 @@ class PaypalHelper
 
     public function add_subscription($plan_id, $data)
     {
-        // dd($data);
         try {
             $create_plan = new Client();
             $response =  $create_plan->post('https://api-m.sandbox.paypal.com/v1/billing/subscriptions', [
@@ -290,7 +289,7 @@ class PaypalHelper
                             "payer_selected" => "PAYPAL",
                             "payee_preferred" => "IMMEDIATE_PAYMENT_REQUIRED"
                         ],
-                        "return_url" => $this->front_url,
+                        "return_url" => $data['url'],
                         "cancel_url" => "https://example.com/cancelUrl"
                     ]
                 ]
@@ -326,5 +325,30 @@ class PaypalHelper
                 ],
             ]
         ]);
+    }
+
+    public function change_url($id, $url)
+    {
+        try {
+            $url_change = new Client();
+            $response =  $url_change->patch('https://api-m.sandbox.paypal.com/v1/billing/subscriptions/'.$id, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->getToken(),
+                    'Prefer' => 'return=representation',
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'json' => [
+                    [
+                        "op"=> "replace",
+                        "path"=> "/plan/return_url",
+                        "value"=> $url,
+                    ],
+                ]
+            ]);
+        } catch (Exception $e) {
+            // Handle exceptions
+           dd($e->getMessage());
+        } 
     }
 }
