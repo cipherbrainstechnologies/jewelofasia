@@ -215,17 +215,16 @@ class PaymentController extends Controller
             $data = explode('=', $param);
             $param_array[$data[0]] = $data[1];
         }
-        // dd($param_array);
         $customer_id = !empty($param_array['customer_id']) ? $param_array['customer_id'] : '';
         $plan_id = !empty($param_array['plan_id']) ? $param_array['plan_id'] : '';
         $paypal_product_id = !empty($param_array['paypal_product_id']) ? $param_array['paypal_product_id'] : '';
         $quantity = !empty($param_array['quantity']) ? $param_array['quantity'] : 1;
         $deliveryCharge = !empty($param_array['deliveryCharge']) ? $param_array['deliveryCharge'] : 0;
         $customer = User::find($customer_id);
-        $address = CustomerAddress::where('user_id', $customer_id)->first();
+        $address_id = !empty($param_array['delivery_address_id']) ? $param_array['delivery_address_id'] : 0;
+        $address = CustomerAddress::find($address_id);
         $start_date = !empty($param_array['start_date']) ? $param_array['start_date'] : null;
         $order_amount = !empty($param_array['order_amount']) ? $param_array['order_amount'] : 0;
-        // dd($address);
         $payment_info = [
             'quantity' => $quantity,
             'shipping_amount' => $deliveryCharge,
