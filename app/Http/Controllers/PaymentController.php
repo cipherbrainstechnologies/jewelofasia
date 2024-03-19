@@ -239,6 +239,8 @@ class PaymentController extends Controller
         ];
         
         $order = new Order();
+        $order_id = 100000 + Order::all()->count() + 1;
+        $order->id = $order_id;
         $order->user_id = $customer_id;
         $order->is_guest = 0;
         $order->order_amount = $order_amount;
