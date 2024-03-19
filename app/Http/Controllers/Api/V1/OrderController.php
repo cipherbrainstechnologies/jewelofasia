@@ -174,7 +174,7 @@ class OrderController extends Controller
 
         foreach ($request['cart'] as $c) {
             $product = $this->product->find($c['product_id']);
-            $type = $c['variation'][0]['type'];
+            $type = !empty($c['variation'][0]['type']) ? $c['variation'][0]['type'] : '';
             foreach (json_decode($product['variations'], true) as $var) {
                 if ($type == $var['type'] && $var['stock'] < $c['quantity']) {
                     $validator->getMessageBag()->add('stock', 'Stock is insufficient! available stock ' . $var['stock']);
@@ -296,8 +296,8 @@ class OrderController extends Controller
                     'tax_amount' => $tax_on_product,
                     'discount_on_product' => $discount,
                     'discount_type' => $discount_type,
-                    'variant' => json_encode($c['variant']),
-                    'variation' => json_encode($c['variation']),
+                    'variant' => !empty($c['variant']) ? json_encode($c['variant']): '',
+                    'variation' => !empty($c['variation']) ? json_encode($c['variation']) : '',
                     'is_stock_decreased' => 1,
                     'vat_status' => Helpers::get_business_settings('product_vat_tax_status') === 'included' ? 'included' : 'excluded',
                     'created_at' => now(),
@@ -306,7 +306,7 @@ class OrderController extends Controller
 
                 $total_tax_amount += $or_d['tax_amount'] * $c['quantity'];
 
-                $type = $c['variation'][0]['type'];
+                $type = !empty($c['variation'][0]['type']) ? $c['variation'][0]['type'] : '';
                 $var_store = [];
                 foreach (json_decode($product['variations'], true) as $var) {
                     if ($type == $var['type']) {
