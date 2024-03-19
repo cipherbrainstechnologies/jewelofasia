@@ -291,6 +291,7 @@ class PaymentController extends Controller
         userSubscription::create($user_subscription_data);
         $order = Order::find($order->id);
         $order->transaction_reference = $res->id;
+        $order->payment_status = 'paid';
         $order->save();
         
         if(!empty($res->links[0]->href)) {
