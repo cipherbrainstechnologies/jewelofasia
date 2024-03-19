@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Models\GuestUser;
 use App\Models\OfflinePayment;
 use App\Models\OrderPartialPayment;
+use App\Models\userSubscription;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -90,6 +91,28 @@ class Order extends Model
     public function scopePartial($query)
     {
         return $query->whereHas('partial_payment');
+    }
+
+    public function userSubscription()
+    {
+        return $this->hasOne(userSubscription::class, 'order_id');
+    }
+
+    protected $appends = ['is_sub_product'];
+
+
+    public function getIsSubProductAttribute()
+    {
+        return $this->userSubscription ? 1 : 0;
+    }
+
+    public function subscription()
+    {
+        $total = Order::with(['userSubscription'])->get()->filter(function ($order) {
+            return $order->userSubscription !== null;
+        })->count();
+
+        return $total;
     }
 
 }

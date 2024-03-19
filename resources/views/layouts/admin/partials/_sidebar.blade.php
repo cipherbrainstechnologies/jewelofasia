@@ -229,6 +229,22 @@
                                             </span>
                                         </a>
                                     </li>
+                                    <li class="nav-item {{Request::is('admin/orders/list/subscription')?'active':''}}">
+                                        <a class="nav-link " href="{{route('admin.orders.list',['subscription'])}}"
+                                           title="{{translate('subscription')}}">
+                                            <span class="tio-circle nav-indicator-icon"></span>
+                                            <span class="text-truncate  sidebar--badge-container">
+                                                <span>{{translate('subscription')}}</span>
+                                                    <span class="badge badge-soft-light badge-pill ml-1">
+                                                    {{
+                                                        \App\Model\Order::with(['userSubscription'])->get()->filter(function ($order) {
+                                                            return $order->userSubscription !== null;
+                                                            })->count(),
+                                                    }}
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <!-- End Pages -->
