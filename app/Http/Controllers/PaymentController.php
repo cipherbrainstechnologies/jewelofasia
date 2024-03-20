@@ -255,7 +255,7 @@ class PaymentController extends Controller
         $order->branch_id = 1;
         $order->date = Carbon::parse(now())->format('Y-m-d');
         $order->delivery_date = !empty($start_date) ? Carbon::parse($start_date)->format('Y-m-d') : null;
-        $order->delivery_address = json_encode($address->toArray());
+        $order->delivery_address = json_encode($address);
 
         $order->save();
         $product = Product::where('paypal_product_id', $paypal_product_id)->first();
