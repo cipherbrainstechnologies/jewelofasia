@@ -13,6 +13,7 @@ use App\Http\Controllers\FlutterwaveController;
 use App\Http\Controllers\BkashPaymentController;
 use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Admin\CustomerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +25,8 @@ use App\Http\Controllers\PageController;
 | contains the "web" middleware group. Now create something great!
 |
  */
-
-
+Route::get('/subscription-list',[CustomerController::class,'mmm'])->name('mmm');
+Route::get('/order-create',[CustomerController::class,'mmm1'])->name('mmm1');
 Route::get('/', function () {
     return redirect(\route('admin.dashboard'));
 });
