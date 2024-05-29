@@ -24,8 +24,8 @@ class PaypalHelper
     protected $client;
     protected $client_id;
     protected $secret_id;
-    //private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
-    private $front_url = 'https://jewelsofasia.app/';
+    private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
+    //private $front_url = 'https://jewelsofasia.app/';
 
     public function __construct()
     {
