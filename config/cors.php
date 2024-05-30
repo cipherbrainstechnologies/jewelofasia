@@ -35,11 +35,11 @@
 
 return [
 
-    'paths' => ['api/*', 'storage/app/public/profile/*'],
+    'paths' => ['api/*', 'storage/*'],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['https://phpstack-941212-4384366.cloudwaysapps.com'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
