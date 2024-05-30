@@ -24,8 +24,8 @@ class PaypalHelper
     protected $client;
     protected $client_id;
     protected $secret_id;
-    private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
-    //private $front_url = 'https://jewelsofasia.app/';
+    //private $front_url = 'https://phpstack-941212-4384366.cloudwaysapps.com/';
+    private $front_url = 'https://jewelsofasia.app/';
 
     public function __construct()
     {
@@ -72,7 +72,7 @@ class PaypalHelper
                 "type" => "PHYSICAL",
                 "category" => "FOOD_PRODUCTS",
                 "image_url" => "https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=",
-                "home_url" => "https://phpstack-941212-4384366.cloudwaysapps.com/"
+                "home_url" => "https://jewelsofasia.app/"
             ]
         ]);
         $paypal_product = json_decode($response->getBody()->getContents());
