@@ -39,7 +39,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['https://jewelsofasia.app'],
+    'allowed_origins' => ['https://phpstack-941212-4384366.cloudwaysapps.com'],
 
     'allowed_origins_patterns' => [],
 
