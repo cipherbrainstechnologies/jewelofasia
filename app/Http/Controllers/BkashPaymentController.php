@@ -209,7 +209,7 @@ class BkashPaymentController extends Controller
 
     public function __construct(PaymentRequest $payment)
     {
-        $config = $this->payment_config('afterpay', 'payment_config');
+        $config = $this->payment_config('bkash', 'payment_config');
         if (!is_null($config) && $config->mode == 'live') {
             $this->config_values = json_decode($config->live_values);
         } elseif (!is_null($config) && $config->mode == 'test') {
