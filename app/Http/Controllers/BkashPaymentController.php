@@ -267,7 +267,8 @@ class BkashPaymentController extends Controller
         if (!isset($data)) {
             return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
         }
-
+       
+        $nameParts = explode(' ',json_decode($data->payer_information)->name);
         // $response = $this->getToken();
         $auth =  base64_encode($this->password . ':' . $this->app_secret);
         // session()->put('token', $auth);
@@ -279,8 +280,8 @@ class BkashPaymentController extends Controller
             ],
             'consumer' => [
                 'phoneNumber' => json_decode($data->payer_information)->phone,
-                'givenNames' => 'nisarg',
-                'surname' => 'parekh' ,
+                'givenNames' => $nameParts[0],
+                'surname' => $nameParts[1] ,
             ],
             'merchantReference' => $data->id,
             'merchant' => [
