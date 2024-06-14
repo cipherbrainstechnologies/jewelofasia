@@ -230,7 +230,7 @@ class BkashPaymentController extends Controller
 
     public function getToken()
     {
-        $url = "https://merchant-auth-sandbox.afterpay.com/v2/oauth2/token";
+        $url = "https://merchant-auth.afterpay.com/v2/oauth2/token";
         $post_token = array(
            'grant_type' => 'client_credentials',
             'client_id' => $this->password,
