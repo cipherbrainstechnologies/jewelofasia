@@ -540,8 +540,8 @@ class BusinessSettingsController extends Controller
                     'updated_at' => now()
                 ]);
             }
-        } else if ($name == 'bkash') {
-            DB::table('business_settings')->updateOrInsert(['key' => 'bkash'], [
+        } else if ($name == 'afterpay') {
+            DB::table('business_settings')->updateOrInsert(['key' => 'afterpay'], [
                 'value' => json_encode([
                     'status' => $request['status'],
                     'api_key' => $request['api_key'],
@@ -595,7 +595,7 @@ class BusinessSettingsController extends Controller
     public function payment_config_update(Request $request)
     {
         $validation = [
-            'gateway' => 'required|in:ssl_commerz,paypal,stripe,razor_pay,senang_pay,paystack,paymob_accept,flutterwave,bkash,mercadopago',
+            'gateway' => 'required|in:ssl_commerz,paypal,stripe,razor_pay,senang_pay,paystack,paymob_accept,flutterwave,afterpay,mercadopago',
             'mode' => 'required|in:live,test'
         ];
 
@@ -663,7 +663,7 @@ class BusinessSettingsController extends Controller
                 'public_key' => 'required_if:status,1',
                 'hash' => 'required_if:status,1'
             ];
-        }  elseif ($request['gateway'] == 'bkash') {
+        }  elseif ($request['gateway'] == 'afterpay') {
             $additional_data = [
                 'status' => 'required|in:1,0',
                 'app_key' => 'required_if:status,1',
