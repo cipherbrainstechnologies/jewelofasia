@@ -323,7 +323,7 @@ class BusinessSettingsController extends Controller
         }
 
         $data_values = AddonSetting::whereIn('settings_type', ['payment_config'])
-            ->whereIn('key_name', ['ssl_commerz','paypal','stripe','razor_pay','senang_pay','paystack','paymob_accept','flutterwave','bkash','mercadopago'])
+            ->whereIn('key_name', ['ssl_commerz','paypal','stripe','razor_pay','senang_pay','paystack','paymob_accept','flutterwave','afterpay','mercadopago'])
             ->get();
 
         return view('admin-views.business-settings.payment-index', compact('published_status', 'payment_url', 'data_values'));
