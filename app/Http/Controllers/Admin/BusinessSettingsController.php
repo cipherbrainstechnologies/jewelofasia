@@ -323,7 +323,7 @@ class BusinessSettingsController extends Controller
         }
 
         $data_values = AddonSetting::whereIn('settings_type', ['payment_config'])
-            ->whereIn('key_name', ['ssl_commerz','paypal','stripe','razor_pay','senang_pay','paystack','paymob_accept','flutterwave','afterpay','mercadopago'])
+            ->whereIn('key_name', ['ssl_commerz','paypal','stripe','razor_pay','senang_pay','paystack','paymob_accept','flutterwave','bkash','mercadopago'])
             ->get();
 
         return view('admin-views.business-settings.payment-index', compact('published_status', 'payment_url', 'data_values'));
@@ -540,8 +540,8 @@ class BusinessSettingsController extends Controller
                     'updated_at' => now()
                 ]);
             }
-        } else if ($name == 'afterpay') {
-            DB::table('business_settings')->updateOrInsert(['key' => 'afterpay'], [
+        } else if ($name == 'bkash') {
+            DB::table('business_settings')->updateOrInsert(['key' => 'bkash'], [
                 'value' => json_encode([
                     'status' => $request['status'],
                     'api_key' => $request['api_key'],
@@ -595,7 +595,7 @@ class BusinessSettingsController extends Controller
     public function payment_config_update(Request $request)
     {
         $validation = [
-            'gateway' => 'required|in:ssl_commerz,paypal,stripe,razor_pay,senang_pay,paystack,paymob_accept,flutterwave,afterpay,mercadopago',
+            'gateway' => 'required|in:ssl_commerz,paypal,stripe,razor_pay,senang_pay,paystack,paymob_accept,flutterwave,bkash,mercadopago',
             'mode' => 'required|in:live,test'
         ];
 
@@ -663,7 +663,7 @@ class BusinessSettingsController extends Controller
                 'public_key' => 'required_if:status,1',
                 'hash' => 'required_if:status,1'
             ];
-        }  elseif ($request['gateway'] == 'afterpay') {
+        }  elseif ($request['gateway'] == 'bkash') {
             $additional_data = [
                 'status' => 'required|in:1,0',
                 'app_key' => 'required_if:status,1',
