@@ -284,8 +284,8 @@ class BkashPaymentController extends Controller
             ],
             'merchantReference' => $data->id,
             'merchant' => [
-                'redirectConfirmUrl' => route('afterpay.callback', ['payment_id' => $data->id]),
-                'redirectCancelUrl' => route('afterpay.callback', ['payment_id' => $data->id])
+                'redirectConfirmUrl' => route('bkash.callback', ['payment_id' => $data->id]),
+                'redirectCancelUrl' => route('bkash.callback', ['payment_id' => $data->id])
             ]
         ];
 
