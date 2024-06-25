@@ -246,7 +246,7 @@ class OrderController extends Controller
                 'updated_at' => now(),
             ];
             \Log::info('notes: ' . $request['order_note']);
-            Log::info('All Request Parameters: ' . json_encode($request->all()));
+            \Log::info('All Request Parameters: ' . json_encode($request->all()));
             $o_time = $or['time_slot_id'];
             $o_delivery = $or['delivery_date'];
 
