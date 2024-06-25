@@ -243,8 +243,8 @@ foreach ($socialMediaList as $social) {
                                             @if($order->is_guest == 0 && isset($order->delivery_address))
                                                 <td style="max-width:130px">
                                                     <h3 class="subtitle">{{ translate('Delivery Address') }}</h3>
-                                                    <span class="d-block">{{ $order->delivery_address->contact_person_name }}</span>
-                                                    <span class="d-block" >{{ $order->delivery_address->address }}</span>
+                                                    <span class="d-block">{{ $order->delivery_address['contact_person_name'] }}</span>
+                                                    <span class="d-block" >{{ $order->delivery_address['address'] }}</span>
                                                 </td>
                                             @endif
                                         </tr>
