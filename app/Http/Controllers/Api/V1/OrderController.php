@@ -407,6 +407,8 @@ class OrderController extends Controller
                 }
 
             } catch (\Exception $e) {
+                 \Log::error('Mail failed to send: ' . $e->getMessage());
+                 \Log::error('Trace: ' . $e->getTraceAsString());
             }
 
             return response()->json([
