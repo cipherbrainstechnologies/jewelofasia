@@ -377,7 +377,7 @@ class OrderController extends Controller
 
             $order_status_message = ($request->payment_method == 'cash_on_delivery' || $request->payment_method == 'offline_payment') ? 'pending':'confirmed';
             $message = Helpers::order_status_update_message($order_status_message);
-
+            
             if ($language_code != 'en'){
                 $message = $this->translate_message($language_code, $order_status_message);
             }
@@ -399,8 +399,9 @@ class OrderController extends Controller
 
                 //send email
                 $emailServices = Helpers::get_business_settings('mail_config');
-
+                \Log::info('emailServices: ' . $emailServices['status']);
                 if (isset($emailServices['status']) && $emailServices['status'] == 1 && isset($customer->email)) {
+                  \Log::info('order id: ' . $order_id);
                     Mail::to($customer->email)->send(new OrderPlaced($order_id));
                 }
 
