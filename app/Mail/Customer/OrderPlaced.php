@@ -33,7 +33,7 @@ class OrderPlaced extends Mailable
         $order_id = $this->order_id;
         $order = Order::with('delivery_address')->find($order_id);
         \Log::info('order id done : ' . $order_id);
-        \Log::info('Delivery Address Contact Person Name: ' . $order);
+        \Log::info('Delivery Address Contact Person Name: ' . $order->toJson());
         return $this->view('email-templates.customer.order-placed', ['order' => $order]);
     }
 }
