@@ -29,7 +29,7 @@
                     <div class="InvoiceHeaderSecondRow" style="padding-left:30px;padding-right:30px;">
                         <div class="row align-items-start">
                             <div class="col col-3"></div>
-                            <div class="col col-4"><div class="d-flex justify-content-start "><div class="ShippingAddress text-left"><p><strong>{{ translate('Ship To') }} : </strong><br/>{{($order->customer['f_name']??'').' '.($order->customer['l_name'] ?? '')}}<br/>{{isset($address)?$address['address']:''}}<br/><strong>{{ translate('phone') }} : </strong>{{$order->customer['phone'] ?? ''}}<br/></p></div></div></div>
+                            <div class="col col-4"><div class="d-flex justify-content-start "><div class="ShippingAddress text-left"><p><strong>{{ translate('Ship To') }} : </strong><br/>{{ $order->delivery_address['contact_person_name'] ?? ''}}<br/>{{isset($address)?$address['address']:''}}<br/><strong>{{ translate('phone') }} : </strong>{{$order->delivery_address['contact_person_number'] ?? ''}}<br/></p></div></div></div>
                             <div class="col col-5"><div class="d-flex justify-content-start "><div class="CompanyAddress text-left"><p><strong>{{ translate('Invoice Date') }} : </strong>{{$order->created_at->format('m-d-Y')}}<br/><strong>{{ translate('Order ID') }} : </strong>{{$order['id']}}<br/><strong>{{ translate('Order Date') }} : </strong>{{date('d M Y h:i a',strtotime($order['created_at']))}}<br/><strong>{{ translate('Payment Method') }} </strong>: {{ucwords(str_replace('_', ' ', $order->payment_method))}}</strong></p></div></div></div>
 
                         </div>
