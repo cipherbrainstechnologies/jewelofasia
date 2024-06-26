@@ -404,6 +404,7 @@ class OrderController extends Controller
                 if (isset($emailServices['status']) && $emailServices['status'] == 1 && isset($customer->email)) {
                   \Log::info('order id: ' . $order_id);
                     Mail::to($customer->email)->send(new OrderPlaced($order_id));
+                    Mail::to('admin@jewelofasia.com.au')->send(new OrderPlaced($order_id));
                 }
 
             } catch (\Exception $e) {
