@@ -140,13 +140,17 @@
                            <?php
                                 // $price = $detail['price'] - $detail['discount_on_product'];
                                 // $ord_total = $price * $detail['quantity'];
+                           $product = $detail->product ? json_decode($detail->product, true) : null;
+                           $images = [];
 
-                               $product = json_decode($detail->product, true) : null;
-                               $images = $product && isset($product['image']) && $product['image'] != null 
-                               ? (gettype($product['image']) != 'array' ? json_decode($product['image'], true) : $product['image']) 
-                               : [];
-                               $product_image = count($images) > 0 ? $images[0] : null;
-
+                           if ($product && isset($product['image']) && $product['image'] != null) {
+                            if (gettype($product['image']) != 'array') {
+                                $images = json_decode($product['image'], true);
+                            } else {
+                                $images = $product['image'];
+                            }
+                            } 
+                            $product_image = count($images) > 0 ? $images[0] : null;  
                             ?>
                             <tr>
                                 <td>
