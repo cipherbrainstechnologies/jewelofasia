@@ -5686,3 +5686,19 @@ aside .navbar-vertical-content {
 .adm-subscription-list {
   margin-top: -20rem;
 }
+dd {
+    margin-bottom: 2px;
+}
+@media print {
+table{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ table tbody{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ table thead{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ table tr{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ table td{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ table th{color: #000;  border: 1px solid #000;  border-collapse: collapse;}
+ #printableArea{
+  width:101.6mm;
+  height:152.4mm;
+  margin:10mm;
+ }
+}

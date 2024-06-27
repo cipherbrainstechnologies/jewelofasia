@@ -206,7 +206,123 @@ class ReportController extends Controller
 
         return view('admin-views.report.new-sale-report', compact( 'orders', 'total_order', 'total_sold', 'total_qty', 'order_details', 'branches', 'branch_id', 'start_date', 'end_date'));
     }
+    public function new_product_report(Request $request): \Illuminate\Contracts\View\View|Factory|Application
+    {
+        $query_param=[];
+        $branches = $this->branch->all();
+        $branch_id = $request['branch_id'];
+        $start_date = $request['start_date'];
+        $end_date = $request['end_date'];
 
+
+    if ($branch_id == 'all') {
+        $orders = $this->order
+            ->when((!is_null($start_date) && !is_null($end_date)), function ($query) use ($start_date, $end_date) {
+                return $query->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date);
+            })
+            ->pluck('id')
+            ->toArray();
+    } else {
+        $orders = $this->order
+            ->where('branch_id', $branch_id)
+            ->when((!is_null($start_date) && !is_null($end_date)), function ($query) use ($start_date, $end_date) {
+                return $query->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date);
+            })
+            ->pluck('id')
+            ->toArray();
+    }
+     $query_param = ['branch_id' => $branch_id, 'start_date' => $start_date, 'end_date' => $end_date];
+     //\DB::enableQueryLog();
+     $order_details = $this->order_detail->with('product')
+        ->whereIn('order_id', $orders)
+        ->selectRaw('product_id, SUM(quantity) as total_quantity, COUNT(*) as order_count, MIN(created_at) as created_at')
+        ->groupBy('product_id')
+        ->paginate(Helpers::getPagination())->appends($query_param);
+   //dd(\DB::getQueryLog());
+
+    \Log::info('order_details'.$order_details->tojson());
+
+    $product_qty = [];
+    $product_orders = [];
+
+    $total_sold = 0;
+    $total_qty = 0;
+    foreach ($order_details as $detail) {
+        $total_qty += $detail->total_quantity;
+        // Calculate total sold
+        $price = $detail->price - $detail->discount_on_product;
+        $total_sold += $price * $detail->total_quantity;
+    }
+     return view('admin-views.report.new-product-report', compact('orders','total_sold','total_qty','order_details','branches','branch_id','start_date',
+        'end_date'));
+    }
+    
+    public function export_product_report(Request $request):  \Symfony\Component\HttpFoundation\StreamedResponse|string
+    {
+    $branch_id = $request->input('branch_id');
+    $start_date = $request->input('start_date');
+    $end_date = $request->input('end_date');
+
+    // Fetch orders based on branch_id and date range
+    if ($branch_id == 'all') {
+        $orders = $this->order
+            ->when(!empty($start_date) && !empty($end_date), function ($query) use ($start_date, $end_date) {
+                return $query->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date);
+            })
+            ->pluck('id')
+            ->toArray();
+    } else {
+        $orders = $this->order
+            ->where('branch_id', $branch_id)
+            ->when(!empty($start_date) && !empty($end_date), function ($query) use ($start_date, $end_date) {
+                return $query->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date);
+            })
+            ->pluck('id')
+            ->toArray();
+    }
+
+    $query_param = [
+        'branch_id' => $branch_id,
+        'start_date' => $start_date,
+        'end_date' => $end_date,
+    ];
+
+    // Fetch order details based on orders retrieved
+    $order_details = $this->order_detail->with('product')
+        ->whereIn('order_id', $orders)
+        ->selectRaw('product_id, SUM(quantity) as total_quantity, COUNT(*) as order_count, MIN(created_at) as created_at')
+        ->groupBy('product_id')
+        ->get();
+
+    // Transform data for export
+    $exportData = [];
+    $exportData[] = [
+        'Start Date' => $start_date,
+        'End Date' => $end_date,
+         'Product Info' => '',
+         'Qty' => '',
+         'Order Count' => ''
+    ];
+
+    foreach ($order_details as $key => $detail) {
+        $product = $detail->product;
+        $exportData[] = [
+            'Start Date' => '',
+            'End Date' => '',
+            'Product Info' => isset($product) ? $product->name : 'Product Deleted',
+            'Qty' => $detail->total_quantity,
+            'Order Count' => $detail->order_count
+
+        ];
+
+    }
+    return (new FastExcel($exportData))->download('prdouct_details.xlsx');
+    }
+    
     /**
      * @param Request $request
      * @return Application|Factory|\Illuminate\Contracts\View\View

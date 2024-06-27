@@ -14,24 +14,137 @@
                 </center>
                 <hr class="non-printable">
             </div>
-            <div class=" sds new" style="max-width:1130px !important;">
+            <div class=" sds new" style="max-width:1130px !important;width:100%;padding:20px 30px;">
                 <div class="pt-3">
                     
                 </div>
-                <div class="InvoiceHeader" style="padding-left:30px;padding-right:30px;">
+                <div class="InvoiceHeader">
                     <div class="InvoiceHeaderFirstRow mb-3">
                         <div class="row align-items-center">
-                            <div class="col col-7 text-left" style="text-align:left;"><img src="{{asset('/public/assets/admin/img/Logo.png')}}" class="initial-38-2" alt="" style="width:auto;"></div>
-                            <div class="col col-5"><div class="d-flex justify-content-start "><div class="CompanyAddress text-left"><strong>{{ $order->branch->name }}</strong><p>{{ $order->branch->address }}</p></div></div></div>
+                            <div class="col col-12 " style="text-align:center;"><img src="{{asset('/public/assets/admin/img/Logo.png')}}" class="initial-38-2" alt="" style="width:auto;"></div>
+                            <div class="col col-12 " style="text-align:center;"><div class="CompanyAddress text-center"><p style="margin:0;"><strong>{{ $order->branch->name }}</strong></p></div></div>
+                            <div class="col col-12"><div class="d-flex justify-content-center text-center"><p>{{ $order->branch->address }}</p></div></div></div>
                         </div>
                     </div>
                     @php($address=\App\Model\CustomerAddress::find($order['delivery_address_id']))
-                    <div class="InvoiceHeaderSecondRow" style="padding-left:30px;padding-right:30px;">
+                    <div class="InvoiceHeaderSecondRow">
                         <div class="row align-items-start">
-                            <div class="col col-3"></div>
-                            <div class="col col-4"><div class="d-flex justify-content-start "><div class="ShippingAddress text-left"><p><strong>{{ translate('Ship To') }} : </strong><br/>{{ $order->delivery_address['contact_person_name'] ?? ''}}<br/>{{isset($address)?$address['address']:''}}<br/><strong>{{ translate('phone') }} : </strong>{{$order->delivery_address['contact_person_number'] ?? ''}}<br/></p></div></div></div>
-                            <div class="col col-5"><div class="d-flex justify-content-start "><div class="CompanyAddress text-left"><p><strong>{{ translate('Invoice Date') }} : </strong>{{$order->created_at->format('m-d-Y')}}<br/><strong>{{ translate('Order ID') }} : </strong>{{$order['id']}}<br/><strong>{{ translate('Order Date') }} : </strong>{{date('d M Y h:i a',strtotime($order['created_at']))}}<br/><strong>{{ translate('Payment Method') }} </strong>: {{ucwords(str_replace('_', ' ', $order->payment_method))}}</strong></p></div></div></div>
+                            <div class="col col-7"><div class="d-flex justify-content-start "><div class="ShippingAddress text-left"><p><strong>{{ translate('Ship To') }} : </strong><br/>{{ $order->delivery_address['contact_person_name'] ?? ''}}<br/>{{isset($address)?$address['address']:''}}<br/><strong>{{ translate('phone') }} : </strong>{{$order->delivery_address['contact_person_number'] ?? ''}}<br/></p></div></div></div>
+                            <div class="col col-5">
+                                <div class="outer" >
+                                    <div class="d-flex justify-content-start align-items-start text-left">
+                                        <div class="col col-5"><strong>{{ translate('Invoice Date') }} :</strong></div>
+                                        <div class="col col-7">{{$order->created_at->format('m-d-Y')}}</div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-start text-left">
+                                        <div class="col col-5"><strong>{{ translate('Order ID') }} :</strong></div>
+                                        <div class="col col-7">{{$order['id']}}</div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-start text-left">
+                                        <div class="col col-5"><strong>{{ translate('Order Date') }} :</strong></div>
+                                        <div class="col col-7">{{date('d M Y h:i a',strtotime($order['created_at']))}}</div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-start text-left">
+                                        <div class="col col-5"><strong>{{ translate('Payment Method') }} :</strong></div>
+                                        <div class="col col-7">{{ucwords(str_replace('_', ' ', $order->payment_method))}}</div>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
+                    </div>
+                    <span class="initial-38-5"><hr style="border-color:transparent;margin-top: 2px;margin-bottom: 2px;"/></span>
+                    <div class="table-outer">
+                        <table class="table table-bordered mt-3" style="color: #000;border:1px solid #000;border-collapse:collapse;">
+                            <thead>
+                            <tr style="border:1px solid #000;border-collapse:collapse;">
+                                <th class="initial-38-7 border-top-0 border-bottom-0" style="width:50%;border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{ translate('PRODUCT') }}</th>
+                                <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12.5%;border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{ translate('QTY') }}</th>
+                                <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12.5%;border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{ translate('UNIT PRICE') }}</th>
+                                <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12.5%;border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{ translate('DISCOUNT') }}</th>
+                                <th class="initial-38-7 border-top-0 border-bottom-0" style="width:12.5%;border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{ translate('PRICE') }}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @php($sub_total=0)
+                            @php($total_tax=0)
+                            @php($total_dis_on_pro=0)
+                            @php($updated_total_tax=0)
+                            @php($vat_status = '')
+                            @foreach($order->details as $detail)
+
+                                @if($detail->product_details !=null)
+                                    @php($product = json_decode($detail->product_details, true))
+                                    <tr style="border:1px solid #000;border-collapse:collapse;">
+                                        <td class="" style="border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">{{$product['name']}}</td>
+                                        <td class="" style="border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">
+                                            {{$detail['quantity']}}
+                                        </td>
+                                        <td class="" style="border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">
+                                            {{ Helpers::set_symbol($detail['price']) }}
+                                        </td>
+                                        <td class="" style="border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">
+                                            {{ Helpers::set_symbol($detail['discount_on_product']) }}
+                                        </td>
+                                        <td class="w-28p" style="border:1px solid #000;border-collapse:collapse;padding: 8px 10px;">
+                                            @php($amount=($detail['price']-$detail['discount_on_product'])*$detail['quantity'])
+                                            {{ Helpers::set_symbol($amount) }}
+                                        </td>
+                                    </tr>
+
+                                    @php($sub_total+=$amount)
+                                    @php($total_tax+=$detail['tax_amount']*$detail['quantity'])
+                                    @php($updated_total_tax+= $detail['vat_status'] === 'included' ? 0 : $detail['tax_amount']*$detail['quantity'])
+                                    @php($vat_status = $detail['vat_status'])
+
+                                @endif
+
+                            @endforeach
+                            </tbody>
+                        </table>
+                        <div class="px-3">
+                            <dl class="row text-right justify-content-center">
+                                <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{ translate('Items Price') }}:</dt>
+                                <dd class="col-6" style="padding-left:5px;padding-right:5px;">{{ Helpers::set_symbol($sub_total) }}</dd>
+                                <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{translate('Tax / VAT')}} {{ $vat_status == 'included' ? translate('(included)') : '' }}:</dt>
+                                <dd class="col-6" style="padding-left:5px;padding-right:5px;">{{ Helpers::set_symbol($total_tax) }}</dd>
+
+                                <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{ translate('Subtotal') }}:</dt>
+                                <dd class="col-6" style="padding-left:5px;padding-right:5px;">
+                                    {{ Helpers::set_symbol($sub_total+$updated_total_tax) }}</dd>
+                                <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{ translate('Coupon Discount') }}:</dt>
+                                <dd class="col-6" style="padding-left:5px;padding-right:5px;">
+                                    - {{ Helpers::set_symbol($order['coupon_discount_amount']) }}</dd>
+                                @if($order['order_type'] == 'pos')
+                                    <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{translate('extra Discount')}}:</dt>
+                                    <dd class="col-6" style="padding-left:5px;padding-right:5px;">
+                                        - {{ Helpers::set_symbol($order['extra_discount']) }}</dd>
+                                @endif
+                                <dt class="col-6" style="padding-left:5px;padding-right:5px;">{{ translate('Delivery Fee') }}:</dt>
+                                <dd class="col-6" style="padding-left:5px;padding-right:5px;">
+                                    @if($order['order_type']=='take_away')
+                                        @php($del_c=0)
+                                    @else
+                                        @php($del_c=$order['delivery_charge'])
+                                    @endif
+                                    {{ Helpers::set_symbol($del_c) }}
+                                    <hr style="border-color: #000;margin: 5px 0;">
+                                </dd>
+
+                                <dt class="col-6 font-20px" style="padding-left:5px;padding-right:5px;">{{ translate('Total') }}:</dt>
+                                <dd class="col-6 font-20px" style="padding-left:5px;padding-right:5px;">{{ Helpers::set_symbol($sub_total+$del_c+$updated_total_tax-$order['coupon_discount_amount']-$order['extra_discount']) }}</dd>
+                            </dl>
+                             <h5 class="text-center pt-3">
+                              <div class="d-flex justify-content-start"><strong>{{ translate('Customer Note') }} : </strong><p>{{ $order->order_note}}</p></div>
+                            </h5>
+                            <span class="initial-38-5"><hr style="border-color: #000;margin-top: 12px;margin-bottom: 7px;"/></span>
+                           
+                            <h5 class="text-center pt-1">
+                                <span class="d-block">Thank You for the Order!! Eat Healthy, Stay Healthy</span>
+                            </h5>
+                            <span class="initial-38-5"><hr style="border-color: #000;margin-top: 7px;margin-bottom: 12px;"/></span>
+                            <span class="d-block text-center">JOA Foods PTY LTD</span>
                         </div>
                     </div>
                 </div>
@@ -99,111 +212,8 @@
                 </div>
                 <h5 class="text-uppercase"></h5>
                 */ ?>
-                <span class="initial-38-5"><hr style="border-color: #000;"/></span>
-                <div class="table-outer" style="padding-left:30px;padding-right:30px;">
-                    <table class="table table-bordered mt-3" style="color: #000;border:1px solid #000;border-collapse:collapse;">
-                        <thead>
-                        <tr style="border:1px solid #000;border-collapse:collapse;">
-                            <th class="initial-38-7 border-top-0 border-bottom-0" style="width:52%;border:1px solid #000;border-collapse:collapse;">{{ translate('PRODUCT') }}</th>
-                            <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12%;border:1px solid #000;border-collapse:collapse;">{{ translate('QTY') }}</th>
-                            <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12%;border:1px solid #000;border-collapse:collapse;">{{ translate('UNIT PRICE') }}</th>
-                            <th class="initial-38-6 border-top-0 border-bottom-0" style="width:12%;border:1px solid #000;border-collapse:collapse;">{{ translate('DISCOUNT') }}</th>
-                            <th class="initial-38-7 border-top-0 border-bottom-0" style="width:12%;border:1px solid #000;border-collapse:collapse;">{{ translate('PRICE') }}</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        @php($sub_total=0)
-                        @php($total_tax=0)
-                        @php($total_dis_on_pro=0)
-                        @php($updated_total_tax=0)
-                        @php($vat_status = '')
-                        @foreach($order->details as $detail)
-
-                            @if($detail->product_details !=null)
-                                @php($product = json_decode($detail->product_details, true))
-                                <tr style="border:1px solid #000;border-collapse:collapse;">
-                                    <td class="" style="border:1px solid #000;border-collapse:collapse;">
-                                        {{$product['name']}} <br>
-                                        @if(count(json_decode($detail['variation'],true))>0)
-                                            Variation : 
-                                            @foreach(json_decode($detail['variation'],true)[0] ?? json_decode($detail['variation'],true) as $key1 =>$variation)
-                                                <div class="font-size-sm">
-                                                    <span class="text-capitalize">{{$key1}} :  </span>
-                                                    <span class="font-weight-bold">{{$variation}} {{$key1=='price'?\App\CentralLogics\Helpers::currency_symbol():''}}</span>
-                                                </div>
-                                            @endforeach
-                                        @endif
-                                    </td>
-                                    <td class="" style="border:1px solid #000;border-collapse:collapse;">
-                                        {{$detail['quantity']}}
-                                    </td>
-                                    <td class="" style="border:1px solid #000;border-collapse:collapse;">
-                                        {{ Helpers::set_symbol($detail['price']) }}
-                                    </td>
-                                    <td class="" style="border:1px solid #000;border-collapse:collapse;">
-                                        {{ Helpers::set_symbol($detail['discount_on_product']) }}
-                                    </td>
-                                    <td class="w-28p" style="border:1px solid #000;border-collapse:collapse;">
-                                        @php($amount=($detail['price']-$detail['discount_on_product'])*$detail['quantity'])
-                                        {{ Helpers::set_symbol($amount) }}
-                                    </td>
-                                </tr>
-
-                                @php($sub_total+=$amount)
-                                @php($total_tax+=$detail['tax_amount']*$detail['quantity'])
-                                @php($updated_total_tax+= $detail['vat_status'] === 'included' ? 0 : $detail['tax_amount']*$detail['quantity'])
-                                @php($vat_status = $detail['vat_status'])
-
-                            @endif
-
-                        @endforeach
-                        </tbody>
-                    </table>
-                    <div class="px-3">
-                        <dl class="row text-right justify-content-center">
-                            <dt class="col-6">{{ translate('Items Price') }}:</dt>
-                            <dd class="col-6">{{ Helpers::set_symbol($sub_total) }}</dd>
-                            <dt class="col-6">{{translate('Tax / VAT')}} {{ $vat_status == 'included' ? translate('(included)') : '' }}:</dt>
-                            <dd class="col-6">{{ Helpers::set_symbol($total_tax) }}</dd>
-
-                            <dt class="col-6">{{ translate('Subtotal') }}:</dt>
-                            <dd class="col-6">
-                                {{ Helpers::set_symbol($sub_total+$updated_total_tax) }}</dd>
-                            <dt class="col-6">{{ translate('Coupon Discount') }}:</dt>
-                            <dd class="col-6">
-                                - {{ Helpers::set_symbol($order['coupon_discount_amount']) }}</dd>
-                            @if($order['order_type'] == 'pos')
-                                <dt class="col-6">{{translate('extra Discount')}}:</dt>
-                                <dd class="col-6">
-                                    - {{ Helpers::set_symbol($order['extra_discount']) }}</dd>
-                            @endif
-                            <dt class="col-6">{{ translate('Delivery Fee') }}:</dt>
-                            <dd class="col-6">
-                                @if($order['order_type']=='take_away')
-                                    @php($del_c=0)
-                                @else
-                                    @php($del_c=$order['delivery_charge'])
-                                @endif
-                                {{ Helpers::set_symbol($del_c) }}
-                                <hr style="border-color: #000;">
-                            </dd>
-
-                            <dt class="col-6 font-20px">{{ translate('Total') }}:</dt>
-                            <dd class="col-6 font-20px">{{ Helpers::set_symbol($sub_total+$del_c+$updated_total_tax-$order['coupon_discount_amount']-$order['extra_discount']) }}</dd>
-                        </dl>
-                         <h5 class="text-center pt-3">
-                          <div class="d-flex justify-content-start"><strong>{{ translate('Customer Note') }} : </strong><p>{{ $order->order_note}}</p></div>
-                        </h5>
-                        <span class="initial-38-5"><hr style="border-color: #000;"/></span>
-                       
-                        <h5 class="text-center pt-1">
-                            <span class="d-block">"""{{ translate('THANK YOU') }}"""</span>
-                        </h5>
-                        <span class="initial-38-5"><hr style="border-color: #000;"/></span>
-                        <span class="d-block text-center">{{ $footer_text->value }}</span>
-                    </div>
-                </div>
+                
+                
             </div>
         </div>
     </div>

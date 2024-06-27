@@ -472,6 +472,13 @@
                                     <span class="text-truncate">{{translate('Sales Report')}}</span>
                                 </a>
                             </li>
+                            <li class="navbar-vertical-aside-has-menu {{Request::is('admin/report/product-report')?'active':''}}">
+                                <a class="nav-link " href="{{route('admin.report.product-report')}}"
+                                   title="{{translate('product')}} {{translate('report')}}">
+                                    <span class="tio-chart-bar-1 nav-icon"></span>
+                                    <span class="text-truncate">{{translate('Product Report')}}</span>
+                                </a>
+                            </li>
                             <li class="navbar-vertical-aside-has-menu {{Request::is('admin/report/order')?'active':''}}">
                                 <a class="nav-link " href="{{route('admin.report.order')}}"
                                    title="{{translate('order')}} {{translate('report')}}">

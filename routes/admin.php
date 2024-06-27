@@ -434,7 +434,9 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             //Route::post('sale-report-filter', 'ReportController@sale_filter')->name('sale-report-filter');
             //Route::get('sale-report', 'ReportController@sale_report_index')->name('sale-report');
             Route::get('sale-report', 'ReportController@new_sale_report')->name('sale-report');
+            Route::get('product-report', 'ReportController@new_product_report')->name('product-report');
             Route::get('export-sale-report', 'ReportController@export_sale_report')->name('export-sale-report');
+            Route::get('export-product-excel', 'ReportController@export_product_report')->name('export.product.excel');
             Route::get('expense', 'ReportController@expense_index')->name('expense');
             Route::get('expense-export-excel', 'ReportController@expense_export_excel')->name('expense.export.excel');
             Route::get('expense-export-pdf', 'ReportController@expense_summary_pdf')->name('expense.export.pdf');
