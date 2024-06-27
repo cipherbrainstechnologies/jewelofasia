@@ -141,9 +141,9 @@
                                 // $price = $detail['price'] - $detail['discount_on_product'];
                                 // $ord_total = $price * $detail['quantity'];
 
-                                 $product = json_decode($detail->product, true);
-                                $images = $product['image'] != null ? (gettype($product['image'])!='array'?json_decode($product['image'],true):$product['image']) : [];
-                                $product_image = count($images) > 0 ? $images[0] : null;
+                               $product = json_decode($detail->product, true);
+                           $images = $product['image'] != null ? (gettype($product['image']) != 'array' ? json_decode($product['image'], true) : $product['image']) : [];
+                           $product_image = count($images) > 0 ? $images[0] : null;
 
                             ?>
                             <tr>
@@ -151,15 +151,16 @@
                                     {{$order_details->firstItem()+$key}}
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.product.view', $detail->product_id) }}" target="_blank" class="product-list-media">
-                                        <img src="{{ isset($detail->product->image) ? asset('storage/app/public/product/' . $detail->product->image) : asset('public/assets/admin/img/160x160/2.png') }}"
-                                     onerror="this.src='{{ asset('public/assets/admin/img/160x160/2.png') }}'"
-                                     alt="Product Image"
-                                        />
-                                        <h6 class="name line--limit-2">
-                                            {{ $detail->product->name?? ''}}
-                                        </h6>
-                                    </a>
+                                   <a href="{{ route('admin.product.view', $detail->product_id) }}" target="_blank" class="product-list-media">
+                                    <img src="{{ $product_image ? asset('storage/app/public/product/' . $product_image) : asset('public/assets/admin/img/160x160/2.png') }}"
+                                    onerror="this.src='{{ asset('public/assets/admin/img/160x160/2.png') }}'"
+                                    alt="Product Image"
+
+                                    />
+                                    <h6 class="name line--limit-2">
+                                        {{ $product['name'] ?? '' }}
+                                    </h6>
+                                </a>
                                 </td>
                                 <td>
                                     <span class="badge badge-soft-primary">{{ $detail->total_quantity}}</span>
